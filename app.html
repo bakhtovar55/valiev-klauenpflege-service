@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="Interne Klauenpflege-App für Bakhtovar Valiev – Dokumentation von Kühen, Diagnosen und Behandlungen."
+    content="Interne Klauenpflege-App für Bakhtovar Valiev – Erfassung von Kühen, Diagnosen, Behandlungen und Tagesberichten."
   />
 
   <link rel="manifest" href="manifest.json" />
@@ -35,7 +35,7 @@
     }
 
     header h1 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
@@ -79,6 +79,11 @@
       letter-spacing: 0.08em;
       color: #6b7280;
       margin-bottom: 0.15rem;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 0.2rem;
     }
 
     /* PIN-Login */
@@ -180,14 +185,14 @@
 
     /* Layout */
 
-    .grid {
+    .grid-two {
       display: grid;
       grid-template-columns: 1fr;
       gap: 0.9rem;
     }
 
     @media (min-width: 900px) {
-      .grid {
+      .grid-two {
         grid-template-columns: 1.1fr 1.3fr;
       }
     }
@@ -197,7 +202,7 @@
     form {
       display: grid;
       gap: 0.6rem;
-      margin-top: 0.6rem;
+      margin-top: 0.4rem;
     }
 
     .field-group {
@@ -242,14 +247,20 @@
       gap: 0.6rem;
     }
 
+    @media (max-width: 480px) {
+      .inline-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Table */
 
     .table-wrapper {
-      margin-top: 0.7rem;
+      margin-top: 0.6rem;
       border-radius: 0.9rem;
       border: 1px solid #e5e7eb;
       overflow: auto;
-      max-height: 60vh;
+      max-height: 55vh;
       background: #ffffff;
     }
 
@@ -302,20 +313,6 @@
       color: #111827;
     }
 
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: flex-end;
-      margin-top: 0.5rem;
-    }
-
-    .filter-row input {
-      max-width: 220px;
-      font-size: 0.85rem;
-      padding: 0.35rem 0.5rem;
-    }
-
     footer {
       text-align: center;
       font-size: 0.75rem;
@@ -331,12 +328,11 @@
   </header>
 
   <main>
-    <!-- Login mit einfachem PIN -->
+    <!-- Login -->
     <section class="card" id="login-card">
       <h2>Interner Zugang</h2>
       <p>
-        Dieser Bereich ist nur für dich (Bakhtovar) und dein Team gedacht.
-        Bitte gib deinen PIN ein, um den Arbeitsmodus zu öffnen.
+        Nur für dich und dein Team. Bitte gib deinen PIN ein, um den Arbeitsmodus zu öffnen.
       </p>
 
       <input
@@ -355,146 +351,292 @@
       <div id="pin-message" class="msg"></div>
 
       <p class="muted" style="margin-top: 0.6rem;">
-        Hinweis: Einfacher PIN-Schutz. Später können wir einen richtigen Login mit Server
-        und Accounts für Landwirte einbauen.
+        Einfacher PIN-Schutz. Später können wir einen richtigen Login mit Server und Accounts
+        für Landwirte einbauen.
       </p>
     </section>
 
     <!-- Haupt-App -->
     <section id="app-main" style="display: none;">
-      <div class="grid">
-        <!-- Formular -->
-        <section class="card">
-          <h2>Neue Klauenpflege erfassen</h2>
-          <p class="muted">
-            Für den Einsatz im Stall: große, gut bedienbare Felder. Daten werden lokal auf
-            diesem Gerät gespeichert. Später können wir Online-Sync einbauen.
-          </p>
-
-          <form id="record-form">
-            <div class="field-group">
-              <label for="farm">Betrieb / Hof</label>
-              <input
-                id="farm"
-                type="text"
-                placeholder="z.B. Hof Müller, Waldhof, Rock-Strauss"
-                required
-              />
-            </div>
-
-            <div class="inline-row">
-              <div class="field-group">
-                <label for="cowId">Kuh-Nr.</label>
-                <input id="cowId" type="text" placeholder="z.B. 148" required />
-              </div>
-
-              <div class="field-group">
-                <label for="date">Datum</label>
-                <input id="date" type="date" required />
-              </div>
-            </div>
-
-            <div class="inline-row">
-              <div class="field-group">
-                <label for="diagnosis">Diagnose</label>
-                <select id="diagnosis" required>
-                  <option value="">Bitte wählen</option>
-                  <option value="Mortellaro">Mortellaro</option>
-                  <option value="Sohlengeschwür">Sohlengeschwür</option>
-                  <option value="Weiße Linie">Weiße Linie</option>
-                  <option value="Panaritium">Panaritium</option>
-                  <option value="Überwuchs / funktionelle Pflege">Überwuchs / funktionelle Pflege</option>
-                  <option value="Sonstiges">Sonstiges</option>
-                </select>
-              </div>
-
-              <div class="field-group">
-                <label for="leg">Fuß / Seite</label>
-                <select id="leg">
-                  <option value="">optional</option>
-                  <option value="VL">VL – vorne links</option>
-                  <option value="VR">VR – vorne rechts</option>
-                  <option value="HL">HL – hinten links</option>
-                  <option value="HR">HR – hinten rechts</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field-group">
-              <label for="treatment">Behandlung</label>
-              <input
-                id="treatment"
-                type="text"
-                placeholder="z.B. Ausschneiden, Block, Verband, Klauenbad"
-              />
-            </div>
-
-            <div class="field-group">
-              <label for="notes">Bemerkung</label>
-              <textarea
-                id="notes"
-                placeholder="z.B. Nachkontrolle in 2 Wochen, Laufgang verbessern"
-              ></textarea>
-            </div>
-
-            <div class="btn-row">
-              <button type="submit" class="btn btn-primary">Eintrag speichern</button>
-              <button type="button" class="btn btn-ghost" id="clear-form">
-                Felder leeren
-              </button>
-            </div>
-
-            <div id="form-message" class="msg"></div>
-          </form>
-        </section>
-
-        <!-- Tabelle -->
-        <section class="card">
-          <h2>Dokumentation – Übersicht</h2>
-
-          <div class="filter-row">
-            <div>
-              <div class="label">Filter nach Betrieb</div>
-              <input
-                id="filter-farm"
-                type="text"
-                placeholder="Betrieb filtern..."
-              />
-            </div>
-            <button type="button" class="btn btn-ghost" id="reset-filter">
-              Filter zurücksetzen
-            </button>
-            <button type="button" class="btn btn-danger" id="clear-all">
-              Alle Einträge löschen
-            </button>
-          </div>
-
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Betrieb</th>
-                  <th>Kuh</th>
-                  <th>Datum</th>
-                  <th>Diagnose</th>
-                  <th>Fuß</th>
-                  <th>Behandlung</th>
-                  <th>Bemerkung</th>
-                </tr>
-              </thead>
-              <tbody id="records-body"></tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <section class="card" style="margin-top: 0.5rem;">
-        <h2>Hinweis zur Nutzung</h2>
+      <!-- 1 + 2 -->
+      <section class="card">
+        <div class="section-title">1. Kuh hinzufügen / bearbeiten</div>
         <p class="muted">
-          Diese Version speichert alle Daten nur lokal auf diesem Gerät (localStorage).
-          Beim Gerätewechsel bleiben die Daten auf dem alten Gerät. Später können wir
-          Online-Synchronisation, Accounts für Landwirte und PDF-/Excel-Export ergänzen.
+          Neue Kühe anlegen oder bestehende bearbeiten. Gleiche Kuh-Nummer = Aktualisierung.
         </p>
+
+        <form id="cow-form">
+          <div class="inline-row">
+            <div class="field-group">
+              <label for="cow-number">Kuh Nummer</label>
+              <input id="cow-number" type="text" placeholder="z.B. 245" required />
+            </div>
+            <div class="field-group">
+              <label for="cow-farm">Hof / Betrieb</label>
+              <input id="cow-farm" type="text" placeholder="z.B. Hof Müller" />
+            </div>
+          </div>
+
+          <div class="inline-row">
+            <div class="field-group">
+              <label for="cow-address">Adresse / Ort</label>
+              <input id="cow-address" type="text" placeholder="PLZ, Ort, Straße" />
+            </div>
+            <div class="field-group">
+              <label for="cow-birth">Geburtsdatum</label>
+              <input id="cow-birth" type="date" />
+            </div>
+          </div>
+
+          <div class="inline-row">
+            <div class="field-group">
+              <label for="cow-lame">Aktuell lahm?</label>
+              <select id="cow-lame">
+                <option value="unbekannt">Nein / unbekannt</option>
+                <option value="ja">Ja</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="cow-notes">Notizen zur Kuh</label>
+              <input
+                id="cow-notes"
+                type="text"
+                placeholder="z.B. sensibel beim Beschneiden"
+              />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary">Kuh speichern</button>
+          </div>
+          <div id="cow-message" class="msg"></div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="section-title">2. Behandlung eintragen</div>
+        <p class="muted">
+          Behandlung mit Diagnose, Fuß, Block, Verband, Produkt und nächster Kontrolle
+          dokumentieren.
+        </p>
+
+        <form id="treat-form">
+          <div class="field-group">
+            <label for="treat-cow">Kuh Nummer auswählen</label>
+            <select id="treat-cow" required>
+              <option value="">-- Kuh auswählen --</option>
+            </select>
+          </div>
+
+          <div class="inline-row">
+            <div class="field-group">
+              <label for="treat-date">Datum der Behandlung</label>
+              <input id="treat-date" type="date" required />
+            </div>
+            <div class="field-group">
+              <label for="treat-leg">Fuß / Seite</label>
+              <select id="treat-leg">
+                <option value="">optional</option>
+                <option value="VL">VL (vorne links)</option>
+                <option value="VR">VR (vorne rechts)</option>
+                <option value="HL">HL (hinten links)</option>
+                <option value="HR">HR (hinten rechts)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline-row">
+            <div class="field-group">
+              <label for="treat-diagnosis">Problem / Diagnose</label>
+              <select id="treat-diagnosis" required>
+                <option value="">Krankheit auswählen</option>
+                <option value="Mortellaro">Mortellaro</option>
+                <option value="Sohlengeschwür">Sohlengeschwür</option>
+                <option value="Weiße Linie">Weiße Linie</option>
+                <option value="Panaritium">Panaritium</option>
+                <option value="Überwuchs / funktionelle Pflege">Überwuchs / funktionelle Pflege</option>
+                <option value="Hornspalten / Risse">Hornspalten / Risse</option>
+                <option value="Druckstelle / Ulkus">Druckstelle / Ulkus</option>
+                <option value="Sonstiges">Sonstiges</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="treat-block">Block gesetzt?</label>
+              <select id="treat-block">
+                <option value="nein">Nein / nicht relevant</option>
+                <option value="ja">Ja</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline-row">
+            <div class="field-group">
+              <label for="treat-bandage">Verband?</label>
+              <select id="treat-bandage">
+                <option value="nein">Nein</option>
+                <option value="ja">Ja</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="treat-product">Produkt / Medikament</label>
+              <input
+                id="treat-product"
+                type="text"
+                placeholder="z.B. Spray, Salbe, Pulver"
+              />
+            </div>
+          </div>
+
+          <div class="inline-row">
+            <div class="field-group">
+              <label for="treat-next">Nächste Kontrolle</label>
+              <select id="treat-next">
+                <option value="">Keine / nach Bedarf</option>
+                <option value="7">in 7 Tagen</option>
+                <option value="14">in 14 Tagen</option>
+                <option value="28">in 28 Tagen</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="treat-notes">Zusätzliche Notizen</label>
+              <input
+                id="treat-notes"
+                type="text"
+                placeholder="z.B. stark entzündet, vorsichtig beschneiden"
+              />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary">Behandlung speichern</button>
+          </div>
+          <div id="treat-message" class="msg"></div>
+        </form>
+      </section>
+
+      <!-- 3 + 4 -->
+      <section class="card">
+        <div class="section-title">3. Kuh-Historie anzeigen</div>
+        <p class="muted">
+          Alle Behandlungen einer bestimmten Kuh sehen.
+        </p>
+
+        <div class="field-group" style="margin-top:0.4rem;">
+          <label for="history-cow">Kuh Nummer für Historie</label>
+          <select id="history-cow">
+            <option value="">-- Kuh auswählen --</option>
+          </select>
+        </div>
+
+        <div class="table-wrapper" style="margin-top:0.6rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Diagnose</th>
+                <th>Fuß</th>
+                <th>Block</th>
+                <th>Verband</th>
+                <th>Produkt</th>
+                <th>Bemerkung</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-title">4. Liste aller Kühe</div>
+        <p class="muted">
+          Übersicht über alle angelegten Kühe.
+        </p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Kuh</th>
+                <th>Hof</th>
+                <th>Adresse</th>
+                <th>Geburt</th>
+                <th>Lahm?</th>
+                <th>Notiz</th>
+              </tr>
+            </thead>
+            <tbody id="cow-list-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5 -->
+      <section class="card">
+        <div class="section-title">5. Tagesübersicht / PDF-Bericht</div>
+        <p class="muted">
+          Alle Behandlungen eines Tages anzeigen und für PDF / Druck vorbereiten.
+        </p>
+
+        <div class="inline-row" style="margin-top:0.4rem;">
+          <div class="field-group">
+            <label for="day-date">Datum der Behandlungen</label>
+            <input id="day-date" type="date" />
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-primary" id="day-show">
+            Tagesbericht anzeigen
+          </button>
+          <button type="button" class="btn btn-ghost" id="day-print">
+            Für PDF / Druck vorbereiten
+          </button>
+        </div>
+
+        <div class="table-wrapper" style="margin-top:0.6rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Hof</th>
+                <th>Kuh</th>
+                <th>Datum</th>
+                <th>Diagnose</th>
+                <th>Fuß</th>
+                <th>Block</th>
+                <th>Verband</th>
+                <th>Produkt</th>
+                <th>Nächste Kontrolle</th>
+              </tr>
+            </thead>
+            <tbody id="day-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6 -->
+      <section class="card">
+        <div class="section-title">6. Datenverwaltung / Backup</div>
+        <p class="muted">
+          Alle Daten werden lokal im Browser gespeichert (localStorage). Kein Internet, kein
+          Server – nur auf diesem Gerät. Backup hilft beim Gerätewechsel.
+        </p>
+
+        <div class="btn-row" style="margin-top:0.6rem;">
+          <button type="button" class="btn btn-danger" id="clear-all">
+            Alles löschen (alle Kühe &amp; Behandlungen)
+          </button>
+        </div>
+
+        <div class="btn-row" style="margin-top:0.4rem;">
+          <button type="button" class="btn btn-primary" id="backup-export">
+            Backup exportieren
+          </button>
+          <label class="btn btn-ghost" for="backup-import-input" style="cursor:pointer;">
+            Backup importieren
+          </label>
+          <input type="file" id="backup-import-input" accept="application/json" style="display:none;" />
+        </div>
+
+        <div id="backup-message" class="msg"></div>
       </section>
     </section>
   </main>
@@ -513,8 +655,8 @@
       });
     }
 
-    // Einfacher PIN-Schutz
-    const APP_PIN = "2025"; // при желании поменяешь PIN здесь
+    // PIN
+    const APP_PIN = "2025";
 
     const loginCard = document.getElementById("login-card");
     const appMain = document.getElementById("app-main");
@@ -539,142 +681,388 @@
       }
     });
 
-    // localStorage
-    const STORAGE_KEY = "vkps_records_v1";
+    // Datenmodell
+    const STORAGE_KEY = "vkps_data_v1";
 
-    function loadRecords() {
+    function loadData() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
+        if (!raw) return { cows: [], treatments: [] };
+        const parsed = JSON.parse(raw);
+        return {
+          cows: parsed.cows || [],
+          treatments: parsed.treatments || []
+        };
       } catch (e) {
         console.error("Fehler beim Lesen der Daten", e);
-        return [];
+        return { cows: [], treatments: [] };
       }
     }
 
-    function saveRecords(list) {
+    function saveData(data) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       } catch (e) {
-        console.error("Fehler beim Speichern", e);
+        console.error("Fehler beim Speichern der Daten", e);
       }
     }
 
-    function renderRecords(filterFarm = "") {
-      const tbody = document.getElementById("records-body");
-      if (!tbody) return;
+    function upsertCow(cow) {
+      const data = loadData();
+      const idx = data.cows.findIndex((c) => c.number === cow.number);
+      if (idx >= 0) {
+        data.cows[idx] = cow;
+      } else {
+        data.cows.push(cow);
+      }
+      saveData(data);
+      return idx >= 0 ? "updated" : "created";
+    }
 
-      const all = loadRecords();
-      const filtered = filterFarm
-        ? all.filter((r) =>
-            (r.farm || "").toLowerCase().includes(filterFarm.trim().toLowerCase())
-          )
-        : all;
+    function addTreatment(t) {
+      const data = loadData();
+      data.treatments.push(t);
+      saveData(data);
+    }
 
-      tbody.innerHTML = "";
+    function getTodayISO() {
+      return new Date().toISOString().slice(0, 10);
+    }
 
-      filtered.forEach((r) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${r.farm || ""}</td>
-          <td><span class="badge-small">${r.cowId || ""}</span></td>
-          <td>${r.date || ""}</td>
-          <td><span class="tag">${r.diagnosis || ""}</span></td>
-          <td>${r.leg || ""}</td>
-          <td>${r.treatment || ""}</td>
-          <td>${r.notes || ""}</td>
-        `;
-        tbody.appendChild(tr);
+    // Render-Funktionen
+
+    function refreshCowSelects() {
+      const data = loadData();
+      const treatCow = document.getElementById("treat-cow");
+      const historyCow = document.getElementById("history-cow");
+
+      [treatCow, historyCow].forEach((sel) => {
+        if (!sel) return;
+        const current = sel.value;
+        sel.innerHTML = '<option value="">-- Kuh auswählen --</option>';
+        data.cows
+          .slice()
+          .sort((a, b) => (a.number || "").localeCompare(b.number || ""))
+          .forEach((c) => {
+            const opt = document.createElement("option");
+            opt.value = c.number;
+            opt.textContent = ${c.number} – ${c.farm || ""};
+            sel.appendChild(opt);
+          });
+        if (current) sel.value = current;
       });
+    }
+
+    function renderCowList() {
+      const data = loadData();
+      const tbody = document.getElementById("cow-list-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      data.cows
+        .slice()
+        .sort((a, b) => (a.number || "").localeCompare(b.number || ""))
+        .forEach((c) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><span class="badge-small">${c.number || ""}</span></td>
+            <td>${c.farm || ""}</td>
+            <td>${c.address || ""}</td>
+            <td>${c.birth || ""}</td>
+            <td>${c.lame === "ja" ? "Ja" : "Nein"}</td>
+            <td>${c.notes || ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    function renderHistory(cowNumber) {
+      const tbody = document.getElementById("history-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      if (!cowNumber) return;
+      const data = loadData();
+      data.treatments
+        .filter((t) => t.cowNumber === cowNumber)
+        .sort((a, b) => (a.date || "").localeCompare(b.date || ""))
+        .forEach((t) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${t.date || ""}</td>
+            <td><span class="tag">${t.diagnosis || ""}</span></td>
+            <td>${t.leg || ""}</td>
+            <td>${t.block || ""}</td>
+            <td>${t.bandage || ""}</td>
+            <td>${t.product || ""}</td>
+            <td>${t.notes || ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+    }
+
+    function renderDayOverview(dateISO) {
+      const tbody = document.getElementById("day-body");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      if (!dateISO) return;
+      const data = loadData();
+      data.treatments
+        .filter((t) => t.date === dateISO)
+        .forEach((t) => {
+          const cow = data.cows.find((c) => c.number === t.cowNumber);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${cow?.farm || ""}</td>
+            <td>${t.cowNumber || ""}</td>
+            <td>${t.date || ""}</td>
+            <td><span class="tag">${t.diagnosis || ""}</span></td>
+            <td>${t.leg || ""}</td>
+            <td>${t.block || ""}</td>
+            <td>${t.bandage || ""}</td>
+            <td>${t.product || ""}</td>
+            <td>${t.nextControl || ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      const dateInput = document.getElementById("date");
-      if (dateInput && !dateInput.value) {
-        const today = new Date().toISOString().slice(0, 10);
-        dateInput.value = today;
-      }
+      // Datum heute setzen
+      const treatDate = document.getElementById("treat-date");
+      const dayDate = document.getElementById("day-date");
+      if (treatDate && !treatDate.value) treatDate.value = getTodayISO();
+      if (dayDate && !dayDate.value) dayDate.value = getTodayISO();
 
-      const form = document.getElementById("record-form");
-      const formMsg = document.getElementById("form-message");
-      const clearFormBtn = document.getElementById("clear-form");
+      const cowForm = document.getElementById("cow-form");
+      const cowMsg = document.getElementById("cow-message");
+      const treatForm = document.getElementById("treat-form");
+      const treatMsg = document.getElementById("treat-message");
+      const historyCow = document.getElementById("history-cow");
+      const dayShow = document.getElementById("day-show");
+      const dayPrint = document.getElementById("day-print");
       const clearAllBtn = document.getElementById("clear-all");
-      const filterFarm = document.getElementById("filter-farm");
-      const resetFilter = document.getElementById("reset-filter");
+      const backupExport = document.getElementById("backup-export");
+      const backupImportInput = document.getElementById("backup-import-input");
+      const backupMsg = document.getElementById("backup-message");
 
-      renderRecords();
+      refreshCowSelects();
+      renderCowList();
 
-      form.addEventListener("submit", (e) => {
+      // Kuh speichern
+      cowForm.addEventListener("submit", (e) => {
         e.preventDefault();
-
-        const farm = document.getElementById("farm").value.trim();
-        const cowId = document.getElementById("cowId").value.trim();
-        const date = document.getElementById("date").value;
-        const diagnosis = document.getElementById("diagnosis").value;
-        const leg = document.getElementById("leg").value;
-        const treatment = document.getElementById("treatment").value.trim();
-        const notes = document.getElementById("notes").value.trim();
-
-        if (!farm || !cowId || !date || !diagnosis) {
-          formMsg.textContent =
-            "Bitte mindestens Betrieb, Kuh-Nr., Datum und Diagnose ausfüllen.";
-          formMsg.className = "msg msg-error";
+        const cow = {
+          number: document.getElementById("cow-number").value.trim(),
+          farm: document.getElementById("cow-farm").value.trim(),
+          address: document.getElementById("cow-address").value.trim(),
+          birth: document.getElementById("cow-birth").value,
+          lame: document.getElementById("cow-lame").value,
+          notes: document.getElementById("cow-notes").value.trim()
+        };
+        if (!cow.number) {
+          cowMsg.textContent = "Bitte Kuh-Nummer ausfüllen.";
+          cowMsg.className = "msg msg-error";
           return;
         }
+        const res = upsertCow(cow);
+        cowMsg.textContent =
+          res === "created"
+            ? "Kuh wurde angelegt."
+            : "Kuh wurde aktualisiert.";
+        cowMsg.className = "msg msg-success";
+        refreshCowSelects();
+        renderCowList();
+      });
 
-        const all = loadRecords();
-        all.push({
-          farm,
-          cowId,
+      // Behandlung speichern
+      treatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const cowNumber = document.getElementById("treat-cow").value;
+        const date = document.getElementById("treat-date").value;
+        const diagnosis = document.getElementById("treat-diagnosis").value;
+        if (!cowNumber || !date || !diagnosis) {
+          treatMsg.textContent =
+            "Bitte mindestens Kuh, Datum und Diagnose auswählen.";
+          treatMsg.className = "msg msg-error";
+          return;
+        }
+        const nextDays = document.getElementById("treat-next").value;
+        let nextControl = "";
+        if (nextDays) {
+          const d = new Date(date);
+          d.setDate(d.getDate() + parseInt(nextDays, 10));
+          nextControl = d.toISOString().slice(0, 10);
+        }
+
+        const t = {
+          id: Date.now(),
+          cowNumber,
           date,
           diagnosis,
-          leg,
-          treatment,
-          notes,
-          createdAt: new Date().toISOString()
-        });
-        saveRecords(all);
+          leg: document.getElementById("treat-leg").value,
+          block: document.getElementById("treat-block").value,
+          bandage: document.getElementById("treat-bandage").value,
+          product: document.getElementById("treat-product").value.trim(),
+          nextControl,
+          notes: document.getElementById("treat-notes").value.trim()
+        };
+        addTreatment(t);
+        treatMsg.textContent = "Behandlung wurde gespeichert.";
+        treatMsg.className = "msg msg-success";
 
-        formMsg.textContent = "Eintrag gespeichert.";
-        formMsg.className = "msg msg-success";
-
-        document.getElementById("cowId").value = "";
-        document.getElementById("diagnosis").value = "";
-        document.getElementById("leg").value = "";
-        document.getElementById("treatment").value = "";
-        document.getElementById("notes").value = "";
-
-        renderRecords(filterFarm.value);
+        renderHistory(historyCow.value);
+        renderDayOverview(dayDate.value);
       });
 
-      clearFormBtn.addEventListener("click", () => {
-        form.reset();
-        if (dateInput) {
-          const today = new Date().toISOString().slice(0, 10);
-          dateInput.value = today;
-        }
-        formMsg.textContent = "";
+      // Historie
+      historyCow.addEventListener("change", () => {
+        renderHistory(historyCow.value);
       });
 
+      // Tagesbericht anzeigen
+      dayShow.addEventListener("click", () => {
+        renderDayOverview(dayDate.value);
+      });
+
+      // Für PDF / Druck vorbereiten
+      dayPrint.addEventListener("click", () => {
+        const data = loadData();
+        const dateISO = dayDate.value || getTodayISO();
+        const behandlungen = data.treatments.filter((t) => t.date === dateISO);
+        const win = window.open("", "_blank");
+        const rows = behandlungen
+          .map((t) => {
+            const cow = data.cows.find((c) => c.number === t.cowNumber);
+            return `
+              <tr>
+                <td>${cow?.farm || ""}</td>
+                <td>${t.cowNumber || ""}</td>
+                <td>${t.date || ""}</td>
+                <td>${t.diagnosis || ""}</td>
+                <td>${t.leg || ""}</td>
+                <td>${t.block || ""}</td>
+                <td>${t.bandage || ""}</td>
+                <td>${t.product || ""}</td>
+                <td>${t.nextControl || ""}</td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        win.document.write(`
+          <html>
+          <head>
+            <meta charset="UTF-8" />
+            <title>Klauenpflege Bericht ${dateISO}</title>
+            <style>
+              body { font-family: system-ui, sans-serif; padding: 1.5rem; }
+              h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
+              h2 { font-size: 1rem; margin-bottom: 0.8rem; }
+              .header-bar {
+                padding: 0.8rem 1rem;
+                border-radius: 0.75rem;
+                background: linear-gradient(135deg,#0f766e,#22c55e);
+                color:#fff;
+                margin-bottom: 1rem;
+              }
+              table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+              th, td { border: 1px solid #e5e7eb; padding: 0.4rem; text-align:left; }
+              th { background:#f3f4f6; }
+            </style>
+          </head>
+          <body>
+            <div class="header-bar">
+              <h1>Valiev Klauenpflege Service</h1>
+              <div>Klauenpflege-Bericht – ${dateISO}</div>
+              <div>Bakhtovar Valiev – Mobil in Friesland / Umgebung</div>
+            </div>
+            <h2>Behandlungen an diesem Tag</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Hof</th>
+                  <th>Kuh</th>
+                  <th>Datum</th>
+                  <th>Diagnose</th>
+                  <th>Fuß</th>
+                  <th>Block</th>
+                  <th>Verband</th>
+                  <th>Produkt</th>
+                  <th>Nächste Kontrolle</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || "<tr><td colspan='9'>Keine Behandlungen erfasst.</td></tr>"}
+              </tbody>
+            </table>
+          </body>
+          </html>
+        `);
+        win.document.close();
+        win.focus();
+      });
+
+      // Alles löschen
       clearAllBtn.addEventListener("click", () => {
         if (
           confirm(
-            "Alle Einträge auf diesem Gerät löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+            "Alle Kühe und Behandlungen auf diesem Gerät löschen? Diese Aktion kann nicht rückgängig gemacht werden."
           )
         ) {
-          saveRecords([]);
-          renderRecords(filterFarm.value);
+          saveData({ cows: [], treatments: [] });
+          refreshCowSelects();
+          renderCowList();
+          renderHistory(historyCow.value);
+          renderDayOverview(dayDate.value);
         }
       });
 
-      filterFarm.addEventListener("input", () => {
-        renderRecords(filterFarm.value);
+      // Backup export
+      backupExport.addEventListener("click", () => {
+        const data = loadData();
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json"
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        const today = getTodayISO();
+        a.download = valiev-klauenpflege-backup-${today}.json;
+        a.click();
+        URL.revokeObjectURL(url);
+        backupMsg.textContent = "Backup-Datei wurde erstellt.";
+        backupMsg.className = "msg msg-success";
       });
 
-      resetFilter.addEventListener("click", () => {
-        filterFarm.value = "";
-        renderRecords("");
+      // Backup import
+      backupImportInput.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const parsed = JSON.parse(ev.target.result);
+            saveData({
+              cows: parsed.cows || [],
+              treatments: parsed.treatments || []
+            });
+            backupMsg.textContent = "Backup wurde importiert.";
+            backupMsg.className = "msg msg-success";
+            refreshCowSelects();
+            renderCowList();
+            renderHistory(historyCow.value);
+            renderDayOverview(dayDate.value);
+          } catch (err) {
+            console.error(err);
+            backupMsg.textContent = "Fehler beim Import der Backup-Datei.";
+            backupMsg.className = "msg msg-error";
+          }
+        };
+        reader.readAsText(file);
       });
+
+      // Initial
+      renderHistory("");
+      renderDayOverview(dayDate?.value || getTodayISO());
     });
   </script>
 </body>
