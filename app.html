@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Valiev Klauenpflege – Arbeitsmodus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Interne Klauenpflege-App für Bakhtovar Valiev – Dokumentation von Kühen, Diagnosen und Behandlungen."
+  />
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f766e" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 1rem;
+      text-align: center;
+      background: linear-gradient(135deg, #0f766e, #22c55e);
+      color: white;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 1rem auto 2rem;
+      padding: 0 0.75rem 1.5rem;
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 1rem;
+      padding: 1rem;
+      margin-bottom: 0.9rem;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .card h2 {
+      font-size: 1.05rem;
+      margin-bottom: 0.4rem;
+      color: #a7f3d0;
+    }
+
+    .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #9ca3af;
+      margin-bottom: 0.15rem;
+    }
+
+    .value {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.2);
+      border: 1px solid rgba(45, 212, 191, 0.35);
+      color: #ccfbf1;
+    }
+
+    .muted {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 0.35rem;
+    }
+
+    /* PIN-Login */
+
+    #login-card {
+      text-align: center;
+    }
+
+    #login-card p {
+      font-size: 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .pin-input {
+      font-size: 1.4rem;
+      letter-spacing: 0.3em;
+      text-align: center;
+      padding: 0.4rem 0.7rem;
+      border-radius: 0.75rem;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      width: 9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        background 0.08s ease;
+    }
+
+    .btn-primary {
+      background: #22c55e;
+      color: #022c22;
+      box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(34, 197, 94, 0.55);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #9ca3af;
+      border: 1px solid #4b5563;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .btn-danger {
+      background: #b91c1c;
+      color: #fee2e2;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.4rem;
+    }
+
+    .msg {
+      font-size: 0.8rem;
+      margin-top: 0.35rem;
+    }
+
+    .msg-error {
+      color: #fecaca;
+    }
+
+    .msg-success {
+      color: #bbf7d0;
+    }
+
+    /* Layout */
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns: 1.1fr 1.3fr;
+      }
+    }
+
+    /* Form */
+
+    form {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    input,
+    select,
+    textarea {
+      border-radius: 0.7rem;
+      border: 1px solid #4b5563;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.95rem;
+      background: #020617;
+      color: #e5e7eb;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .inline-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    /* Table */
+
+    .table-wrapper {
+      margin-top: 0.6rem;
+      border-radius: 0.9rem;
+      border: 1px solid #334155;
+      overflow: auto;
+      max-height: 60vh;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    th,
+    td {
+      padding: 0.4rem 0.35rem;
+      border-bottom: 1px solid #1f2937;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #020617;
+      z-index: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      color: #9ca3af;
+    }
+
+    tr:nth-child(even) td {
+      background: #020617;
+    }
+
+    tr:nth-child(odd) td {
+      background: #030712;
+    }
+
+    .tag {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.2);
+      color: #bfdbfe;
+    }
+
+    .badge-small {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.16);
+      color: #e5e7eb;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .filter-row input {
+      max-width: 190px;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.5rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #6b7280;
+      padding-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>VALIEV KLAUENPFLEGE – APP</h1>
+    <p>Interner Arbeitsmodus für Bakhtovar (Tablet / Smartphone)</p>
+  </header>
+
+  <main>
+    <!-- Login mit einfachem PIN -->
+    <section class="card" id="login-card">
+      <h2>Interner Zugang</h2>
+      <p>
+        Dieser Bereich ist nur für dich (Bakhtovar) und dein Team gedacht.
+        Bitte gib deinen PIN ein, um den Arbeitsmodus zu öffnen.
+      </p>
+
+      <input
+        type="password"
+        maxlength="6"
+        placeholder="••••"
+        id="pin-input"
+        class="pin-input"
+        inputmode="numeric"
+      />
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="pin-submit">Arbeitsmodus öffnen</button>
+      </div>
+
+      <div id="pin-message" class="msg"></div>
+
+      <p class="muted" style="margin-top: 0.6rem;">
+        Hinweis: Dies ist nur ein einfacher Schutz. Für echte Kunden-Zugänge und
+        bezahlte Accounts bauen wir später einen richtigen Login mit Server.
+      </p>
+    </section>
+
+    <!-- Haupt-App -->
+    <section id="app-main" style="display: none;">
+      <div class="grid">
+        <!-- Formular -->
+        <section class="card">
+          <h2>Neue Klauenpflege erfassen</h2>
+          <p class="muted">
+            Für den Einsatz im Stall: Felder sind groß und gut mit Handschuhen
+            bedienbar. Daten werden lokal auf diesem Gerät gespeichert
+            (<strong>später können wir Online-Sync einbauen</strong>).
+          </p>
+
+          <form id="record-form" style="margin-top: 0.7rem;">
+            <div class="field-group">
+              <label for="farm">Betrieb / Hof</label>
+              <input
+                id="farm"
+                type="text"
+                placeholder="z.B. Hof Müller, Waldhof, Rock-Strauss"
+                required
+              />
+            </div>
+
+            <div class="inline-row">
+              <div class="field-group">
+                <label for="cowId">Kuh-Nr.</label>
+                <input id="cowId" type="text" placeholder="z.B. 148" required />
+              </div>
+
+              <div class="field-group">
+                <label for="date">Datum</label>
+                <input id="date" type="date" required />
+              </div>
+            </div>
+
+            <div class="inline-row">
+              <div class="field-group">
+                <label for="diagnosis">Diagnose</label>
+                <select id="diagnosis" required>
+                  <option value="">Bitte wählen</option>
+                  <option value="Mortellaro">Mortellaro</option>
+                  <option value="Sohlengeschwür">Sohlengeschwür</option>
+                  <option value="Weiße Linie">Weiße Linie</option>
+                  <option value="Panaritium">Panaritium</option>
+                  <option value="Überwuchs / funktionelle Pflege">
+                    Überwuchs / funktionelle Pflege
+                  </option>
+                  <option value="Sonstiges">Sonstiges</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label for="leg">Fuß / Seite</label>
+                <select id="leg">
+                  <option value="">optional</option>
+                  <option value="VL">VL – vorne links</option>
+                  <option value="VR">VR – vorne rechts</option>
+                  <option value="HL">HL – hinten links</option>
+                  <option value="HR">HR – hinten rechts</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="treatment">Behandlung</label>
+              <input
+                id="treatment"
+                type="text"
+                placeholder="z.B. Ausschneiden, Block, Verband, Klauenbad"
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="notes">Bemerkung</label>
+              <textarea
+                id="notes"
+                placeholder="z.B. Nachkontrolle in 2 Wochen, Laufgang verbessern"
+              ></textarea>
+            </div>
+
+            <div class="btn-row" style="margin-top: 0.4rem;">
+              <button type="submit" class="btn btn-primary">
+                Eintrag speichern
+              </button>
+              <button type="button" class="btn btn-ghost" id="clear-form">
+                Felder leeren
+              </button>
+            </div>
+
+            <div id="form-message" class="msg"></div>
+          </form>
+
+          <div class="muted" style="margin-top: 0.6rem;">
+            Tipp: Wir können später einen Export als PDF / Excel einbauen, damit
+            du für jeden Betrieb einen fertigen Bericht hast.
+          </div>
+        </section>
+
+        <!-- Tabelle -->
+        <section class="card">
+          <h2>Dokumentation – Übersicht</h2>
+
+          <div class="filter-row">
+            <div>
+              <div class="label">Filter nach Betrieb</div>
+              <input
+                id="filter-farm"
+                type="text"
+                placeholder="Betrieb filtern..."
+              />
+            </div>
+            <button type="button" class="btn btn-ghost" id="reset-filter">
+              Filter zurücksetzen
+            </button>
+            <button type="button" class="btn btn-danger" id="clear-all">
+              Alle Einträge löschen
+            </button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Betrieb</th>
+                  <th>Kuh</th>
+                  <th>Datum</th>
+                  <th>Diagnose</th>
+                  <th>Fuß</th>
+                  <th>Behandlung</th>
+                  <th>Bemerkung</th>
+                </tr>
+              </thead>
+              <tbody id="records-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top: 0.9rem;">
+        <h2>Hinweis zur Nutzung</h2>
+        <p class="muted">
+          Diese Version speichert alle Daten nur lokal auf diesem Gerät
+          (<strong>localStorage</strong>). Wenn du z.B. dein Tablet wechselst,
+          sind die Daten auf dem alten Gerät.
+        </p>
+        <p class="muted" style="margin-top: 0.3rem;">
+          Für die Zukunft können wir:
+        </p>
+        <ul class="muted" style="margin-left: 1.1rem; margin-top: 0.2rem;">
+          <li>Online-Synchronisation (Firebase, eigener Server)</li>
+          <li>Account-System für Landwirte (Abo / Zugang verkaufen)</li>
+          <li>Export als PDF oder Excel für jeden Hof</li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 Valiev Klauenpflege Service – Interne Arbeits-App.
+  </footer>
+
+  <script>
+    // PWA Service Worker (falls vorhanden)
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker
+          .register("sw.js")
+          .catch((err) => console.log("Service Worker Fehler:", err));
+      });
+    }
+
+    // Einfacher PIN-Schutz (nur "optische" Sicherheit, kein echtes Login)
+    const APP_PIN = "2025"; // PIN kannst du hier ändern, z.B. "7777"
+
+    const loginCard = document.getElementById("login-card");
+    const appMain = document.getElementById("app-main");
+    const pinInput = document.getElementById("pin-input");
+    const pinSubmit = document.getElementById("pin-submit");
+    const pinMessage = document.getElementById("pin-message");
+
+    pinSubmit.addEventListener("click", () => {
+      const entered = (pinInput.value || "").trim();
+      if (entered === APP_PIN) {
+        loginCard.style.display = "none";
+        appMain.style.display = "block";
+      } else {
+        pinMessage.textContent = "Falscher PIN. Bitte erneut versuchen.";
+        pinMessage.className = "msg msg-error";
+      }
+    });
+
+    pinInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        pinSubmit.click();
+      }
+    });
+
+    // Datenspeicher (localStorage)
+    const STORAGE_KEY = "vkps_records_v1";
+
+    function loadRecords() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.error("Fehler beim Lesen der Daten", e);
+        return [];
+      }
+    }
+
+    function saveRecords(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        console.error("Fehler beim Speichern", e);
+      }
+    }
+
+    function renderRecords(filterFarm = "") {
+      const tbody = document.getElementById("records-body");
+      if (!tbody) return;
+
+      const all = loadRecords();
+      const filtered = filterFarm
+        ? all.filter((r) =>
+            (r.farm || "")
+              .toLowerCase()
+              .includes(filterFarm.trim().toLowerCase())
+          )
+        : all;
+
+      tbody.innerHTML = "";
+
+      filtered.forEach((r) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.farm || ""}</td>
+          <td><span class="badge-small">${r.cowId || ""}</span></td>
+          <td>${r.date || ""}</td>
+          <td><span class="tag">${r.diagnosis || ""}</span></td>
+          <td>${r.leg || ""}</td>
+          <td>${r.treatment || ""}</td>
+          <td>${r.notes || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Datum auf heute setzen
+      const dateInput = document.getElementById("date");
+      if (dateInput && !dateInput.value) {
+        const today = new Date().toISOString().slice(0, 10);
+        dateInput.value = today;
+      }
+
+      const form = document.getElementById("record-form");
+      const formMsg = document.getElementById("form-message");
+      const clearFormBtn = document.getElementById("clear-form");
+      const clearAllBtn = document.getElementById("clear-all");
+      const filterFarm = document.getElementById("filter-farm");
+      const resetFilter = document.getElementById("reset-filter");
+
+      renderRecords();
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const farm = document.getElementById("farm").value.trim();
+        const cowId = document.getElementById("cowId").value.trim();
+        const date = document.getElementById("date").value;
+        const diagnosis = document.getElementById("diagnosis").value;
+        const leg = document.getElementById("leg").value;
+        const treatment = document.getElementById("treatment").value.trim();
+        const notes = document.getElementById("notes").value.trim();
+
+        if (!farm || !cowId || !date || !diagnosis) {
+          formMsg.textContent =
+            "Bitte mindestens Betrieb, Kuh-Nr., Datum und Diagnose ausfüllen.";
+          formMsg.className = "msg msg-error";
+          return;
+        }
+
+        const all = loadRecords();
+        all.push({
+          farm,
+          cowId,
+          date,
+          diagnosis,
+          leg,
+          treatment,
+          notes,
+          createdAt: new Date().toISOString()
+        });
+        saveRecords(all);
+
+        formMsg.textContent = "Eintrag gespeichert.";
+        formMsg.className = "msg msg-success";
+
+        // Formular teilweise leeren (Betrieb bleibt oft gleich)
+        document.getElementById("cowId").value = "";
+        document.getElementById("diagnosis").value = "";
+        document.getElementById("leg").value = "";
+        document.getElementById("treatment").value = "";
+        document.getElementById("notes").value = "";
+
+        renderRecords(filterFarm.value);
+      });
+
+      clearFormBtn.addEventListener("click", () => {
+        form.reset();
+        if (dateInput) {
+          const today = new Date().toISOString().slice(0, 10);
+          dateInput.value = today;
+        }
+        formMsg.textContent = "";
+      });
+
+      clearAllBtn.addEventListener("click", () => {
+        if (
+          confirm(
+            "Alle Einträge auf diesem Gerät löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+          )
+        ) {
+          saveRecords([]);
+          renderRecords(filterFarm.value);
+        }
+      });
+
+      filterFarm.addEventListener("input", () => {
+        renderRecords(filterFarm.value);
+      });
+
+      resetFilter.addEventListener("click", () => {
+        filterFarm.value = "";
+        renderRecords("");
+      });
+    });
+  </script>
+</body>
+</html>
