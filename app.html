@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="Interne Klauenpflege-App für Bakhtovar Valiev – Erfassung von Kühen, Diagnosen, Behandlungen, Tagesberichten und Backup."
+    content="Interne Klauenpflege-App für Bakhtovar Valiev – Kühe, Diagnosen, Behandlungen, Tagesberichte und Backup."
   />
 
   <link rel="manifest" href="manifest.json" />
@@ -61,9 +61,9 @@
       border: 1px solid #e5e7eb;
     }
 
-    .card h2 {
-      font-size: 1.05rem;
-      margin-bottom: 0.4rem;
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 0.2rem;
       color: #065f46;
     }
 
@@ -71,12 +71,6 @@
       font-size: 0.88rem;
       color: #6b7280;
       margin-top: 0.25rem;
-    }
-
-    .section-title {
-      font-weight: 700;
-      margin-bottom: 0.2rem;
-      color: #065f46;
     }
 
     .btn {
@@ -366,13 +360,18 @@
             <label for="treat-diagnosis">Problem / Diagnose</label>
             <select id="treat-diagnosis" required>
               <option value="">Krankheit auswählen</option>
-              <option value="Mortellaro">Mortellaro</option>
+              <option value="Mortellaro (Dermatitis digitalis)">Mortellaro (Dermatitis digitalis)</option>
               <option value="Sohlengeschwür">Sohlengeschwür</option>
-              <option value="Weiße Linie">Weiße Linie</option>
-              <option value="Panaritium">Panaritium</option>
-              <option value="Überwuchs / funktionelle Pflege">Überwuchs / funktionelle Pflege</option>
-              <option value="Hornspalten / Risse">Hornspalten / Risse</option>
-              <option value="Druckstelle / Ulkus">Druckstelle / Ulkus</option>
+              <option value="Weiße-Linie-Defekt">Weiße-Linie-Defekt</option>
+              <option value="Ballengeschwür">Ballengeschwür</option>
+              <option value="Klauenfäule">Klauenfäule</option>
+              <option value="Zwischenklauenentzündung (Phlegmone)">Zwischenklauenentzündung (Phlegmone)</option>
+              <option value="Hornspalt / Riss">Hornspalt / Riss</option>
+              <option value="Überwuchs / Fehlstellung">Überwuchs / Fehlstellung</option>
+              <option value="Trauma / mechanische Verletzung">Trauma / mechanische Verletzung</option>
+              <option value="Limax (doppelte Sohle)">Limax (doppelte Sohle)</option>
+              <option value="Allgemeine Entzündung / Schwellung">Allgemeine Entzündung / Schwellung</option>
+              <option value="Panaritium (tiefe Klauenentzündung)">Panaritium (tiefe Klauenentzündung)</option>
               <option value="Sonstiges">Sonstiges</option>
             </select>
           </div>
@@ -394,11 +393,26 @@
             </select>
           </div>
           <div class="field-group">
-            <label for="treat-product">Produkt / Medikament</label>
+            <label for="treat-product-select">Produkt / Medikament</label>
+            <select id="treat-product-select">
+              <option value="">auswählen</option>
+              <option value="Blau-Spray">Blau-Spray</option>
+              <option value="Novoderm Salbe">Novoderm Salbe</option>
+              <option value="Schwarze Salbe">Schwarze Salbe</option>
+              <option value="Verband">Verband</option>
+              <option value="Holzklotz">Klotz (Holz)</option>
+              <option value="Gummiklotz">Klotz (Gummi)</option>
+              <option value="Klauenbad">Klauenbad</option>
+              <option value="Kupfersulfat / Zinksulfat">Kupfersulfat / Zinksulfat</option>
+              <option value="Antibiotikum lokal">Antibiotikum lokal</option>
+              <option value="Schmerzmittel lokal">Schmerzmittel lokal</option>
+              <option value="Sonstiges">Sonstiges / manuell</option>
+            </select>
             <input
-              id="treat-product"
+              id="treat-product-other"
               type="text"
-              placeholder="z.B. Spray, Salbe, Pulver"
+              placeholder="zusätzliches Produkt / eigener Name"
+              style="margin-top:0.25rem; display:none;"
             />
           </div>
         </div>
@@ -562,23 +576,24 @@
   </footer>
 
   <script>
-    // Service Worker (офлайн-режим)
+    // Service Worker
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
         navigator.serviceWorker
           .register("sw.js")
-          .catch((err) => console.log("Service Worker Fehler:", err));
+          .catch(function (err) {
+            console.log("Service Worker Fehler:", err);
+          });
       });
     }
 
-    // Данные в localStorage
-    const STORAGE_KEY = "vkps_data_v1";
+    var STORAGE_KEY = "vkps_data_v1";
 
     function loadData() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        var raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return { cows: [], treatments: [] };
-        const parsed = JSON.parse(raw);
+        var parsed = JSON.parse(raw);
         return {
           cows: parsed.cows || [],
           treatments: parsed.treatments || []
@@ -598,8 +613,14 @@
     }
 
     function upsertCow(cow) {
-      const data = loadData();
-      const idx = data.cows.findIndex((c) => c.number === cow.number);
+      var data = loadData();
+      var idx = -1;
+      for (var i = 0; i < data.cows.length; i++) {
+        if (data.cows[i].number === cow.number) {
+          idx = i;
+          break;
+        }
+      }
       if (idx >= 0) {
         data.cows[idx] = cow;
       } else {
@@ -610,7 +631,7 @@
     }
 
     function addTreatment(t) {
-      const data = loadData();
+      var data = loadData();
       data.treatments.push(t);
       saveData(data);
     }
@@ -620,21 +641,24 @@
     }
 
     function refreshCowSelects() {
-      const data = loadData();
-      const treatCow = document.getElementById("treat-cow");
-      const historyCow = document.getElementById("history-cow");
+      var data = loadData();
+      var treatCow = document.getElementById("treat-cow");
+      var historyCow = document.getElementById("history-cow");
+      var selects = [treatCow, historyCow];
 
-      [treatCow, historyCow].forEach((sel) => {
+      selects.forEach(function (sel) {
         if (!sel) return;
-        const current = sel.value;
+        var current = sel.value;
         sel.innerHTML = '<option value="">-- Kuh auswählen --</option>';
         data.cows
           .slice()
-          .sort((a, b) => (a.number || "").localeCompare(b.number || ""))
-          .forEach((c) => {
-            const opt = document.createElement("option");
+          .sort(function (a, b) {
+            return (a.number || "").localeCompare(b.number || "");
+          })
+          .forEach(function (c) {
+            var opt = document.createElement("option");
             opt.value = c.number;
-            opt.textContent = ${c.number} – ${c.farm || ""};
+            opt.textContent = c.number + " – " + (c.farm || "");
             sel.appendChild(opt);
           });
         if (current) sel.value = current;
@@ -642,103 +666,172 @@
     }
 
     function renderCowList() {
-      const data = loadData();
-      const tbody = document.getElementById("cow-list-body");
+      var data = loadData();
+      var tbody = document.getElementById("cow-list-body");
       if (!tbody) return;
       tbody.innerHTML = "";
       data.cows
         .slice()
-        .sort((a, b) => (a.number || "").localeCompare(b.number || ""))
-        .forEach((c) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><span class="badge-small">${c.number || ""}</span></td>
-            <td>${c.farm || ""}</td>
-            <td>${c.address || ""}</td>
-            <td>${c.birth || ""}</td>
-            <td>${c.lame === "ja" ? "Ja" : "Nein"}</td>
-            <td>${c.notes || ""}</td>
-          `;
+        .sort(function (a, b) {
+          return (a.number || "").localeCompare(b.number || "");
+        })
+        .forEach(function (c) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td><span class='badge-small'>" +
+            (c.number || "") +
+            "</span></td>" +
+            "<td>" +
+            (c.farm || "") +
+            "</td>" +
+            "<td>" +
+            (c.address || "") +
+            "</td>" +
+            "<td>" +
+            (c.birth || "") +
+            "</td>" +
+            "<td>" +
+            (c.lame === "ja" ? "Ja" : "Nein") +
+            "</td>" +
+            "<td>" +
+            (c.notes || "") +
+            "</td>";
           tbody.appendChild(tr);
         });
     }
 
     function renderHistory(cowNumber) {
-      const tbody = document.getElementById("history-body");
+      var tbody = document.getElementById("history-body");
       if (!tbody) return;
       tbody.innerHTML = "";
       if (!cowNumber) return;
-      const data = loadData();
+      var data = loadData();
       data.treatments
-        .filter((t) => t.cowNumber === cowNumber)
-        .sort((a, b) => (a.date || "").localeCompare(b.date || ""))
-        .forEach((t) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${t.date || ""}</td>
-            <td><span class="tag">${t.diagnosis || ""}</span></td>
-            <td>${t.leg || ""}</td>
-            <td>${t.block || ""}</td>
-            <td>${t.bandage || ""}</td>
-            <td>${t.product || ""}</td>
-            <td>${t.notes || ""}</td>
-          `;
+        .filter(function (t) {
+          return t.cowNumber === cowNumber;
+        })
+        .sort(function (a, b) {
+          return (a.date || "").localeCompare(b.date || "");
+        })
+        .forEach(function (t) {
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" +
+            (t.date || "") +
+            "</td>" +
+            "<td><span class='tag'>" +
+            (t.diagnosis || "") +
+            "</span></td>" +
+            "<td>" +
+            (t.leg || "") +
+            "</td>" +
+            "<td>" +
+            (t.block || "") +
+            "</td>" +
+            "<td>" +
+            (t.bandage || "") +
+            "</td>" +
+            "<td>" +
+            (t.product || "") +
+            "</td>" +
+            "<td>" +
+            (t.notes || "") +
+            "</td>";
           tbody.appendChild(tr);
         });
     }
 
     function renderDayOverview(dateISO) {
-      const tbody = document.getElementById("day-body");
+      var tbody = document.getElementById("day-body");
       if (!tbody) return;
       tbody.innerHTML = "";
       if (!dateISO) return;
-      const data = loadData();
+      var data = loadData();
       data.treatments
-        .filter((t) => t.date === dateISO)
-        .forEach((t) => {
-          const cow = data.cows.find((c) => c.number === t.cowNumber);
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${cow?.farm || ""}</td>
-            <td>${t.cowNumber || ""}</td>
-            <td>${t.date || ""}</td>
-            <td><span class="tag">${t.diagnosis || ""}</span></td>
-            <td>${t.leg || ""}</td>
-            <td>${t.block || ""}</td>
-            <td>${t.bandage || ""}</td>
-            <td>${t.product || ""}</td>
-            <td>${t.nextControl || ""}</td>
-          `;
+        .filter(function (t) {
+          return t.date === dateISO;
+        })
+        .forEach(function (t) {
+          var cow = null;
+          for (var i = 0; i < data.cows.length; i++) {
+            if (data.cows[i].number === t.cowNumber) {
+              cow = data.cows[i];
+              break;
+            }
+          }
+          var farmName = cow ? cow.farm || "" : "";
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" +
+            farmName +
+            "</td>" +
+            "<td>" +
+            (t.cowNumber || "") +
+            "</td>" +
+            "<td>" +
+            (t.date || "") +
+            "</td>" +
+            "<td><span class='tag'>" +
+            (t.diagnosis || "") +
+            "</span></td>" +
+            "<td>" +
+            (t.leg || "") +
+            "</td>" +
+            "<td>" +
+            (t.block || "") +
+            "</td>" +
+            "<td>" +
+            (t.bandage || "") +
+            "</td>" +
+            "<td>" +
+            (t.product || "") +
+            "</td>" +
+            "<td>" +
+            (t.nextControl || "") +
+            "</td>";
           tbody.appendChild(tr);
         });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const treatDate = document.getElementById("treat-date");
-      const dayDate = document.getElementById("day-date");
+    document.addEventListener("DOMContentLoaded", function () {
+      var treatDate = document.getElementById("treat-date");
+      var dayDate = document.getElementById("day-date");
       if (treatDate && !treatDate.value) treatDate.value = getTodayISO();
       if (dayDate && !dayDate.value) dayDate.value = getTodayISO();
 
-      const cowForm = document.getElementById("cow-form");
-      const cowMsg = document.getElementById("cow-message");
-      const treatForm = document.getElementById("treat-form");
-      const treatMsg = document.getElementById("treat-message");
-      const historyCow = document.getElementById("history-cow");
-      const dayShow = document.getElementById("day-show");
-      const dayPrint = document.getElementById("day-print");
-      const clearAllBtn = document.getElementById("clear-all");
-      const backupExport = document.getElementById("backup-export");
-      const backupImportInput = document.getElementById("backup-import-input");
-      const backupMsg = document.getElementById("backup-message");
+      var cowForm = document.getElementById("cow-form");
+      var cowMsg = document.getElementById("cow-message");
+      var treatForm = document.getElementById("treat-form");
+      var treatMsg = document.getElementById("treat-message");
+      var historyCow = document.getElementById("history-cow");
+      var dayShow = document.getElementById("day-show");
+      var dayPrint = document.getElementById("day-print");
+      var clearAllBtn = document.getElementById("clear-all");
+      var backupExport = document.getElementById("backup-export");
+      var backupImportInput = document.getElementById("backup-import-input");
+      var backupMsg = document.getElementById("backup-message");
+      var productSelect = document.getElementById("treat-product-select");
+      var productOther = document.getElementById("treat-product-other");
+
+      if (productSelect && productOther) {
+        productSelect.addEventListener("change", function () {
+          if (productSelect.value === "Sonstiges") {
+            productOther.style.display = "block";
+          } else {
+            productOther.style.display = "none";
+            productOther.value = "";
+          }
+        });
+      }
 
       refreshCowSelects();
       renderCowList();
       renderHistory("");
-      renderDayOverview(dayDate?.value || getTodayISO());
+      renderDayOverview(dayDate ? dayDate.value : getTodayISO());
 
-      cowForm.addEventListener("submit", (e) => {
+      cowForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        const cow = {
+        var cow = {
           number: document.getElementById("cow-number").value.trim(),
           farm: document.getElementById("cow-farm").value.trim(),
           address: document.getElementById("cow-address").value.trim(),
@@ -751,7 +844,7 @@
           cowMsg.className = "msg msg-error";
           return;
         }
-        const res = upsertCow(cow);
+        var res = upsertCow(cow);
         cowMsg.textContent =
           res === "created"
             ? "Kuh wurde angelegt."
@@ -761,35 +854,47 @@
         renderCowList();
       });
 
-      treatForm.addEventListener("submit", (e) => {
+      treatForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        const cowNumber = document.getElementById("treat-cow").value;
-        const date = document.getElementById("treat-date").value;
-        const diagnosis = document.getElementById("treat-diagnosis").value;
+        var cowNumber = document.getElementById("treat-cow").value;
+        var date = document.getElementById("treat-date").value;
+        var diagnosis = document.getElementById("treat-diagnosis").value;
         if (!cowNumber || !date || !diagnosis) {
           treatMsg.textContent =
             "Bitte mindestens Kuh, Datum und Diagnose auswählen.";
           treatMsg.className = "msg msg-error";
           return;
         }
-        const nextDays = document.getElementById("treat-next").value;
-        let nextControl = "";
+
+        var nextDays = document.getElementById("treat-next").value;
+        var nextControl = "";
         if (nextDays) {
-          const d = new Date(date);
+          var d = new Date(date);
           d.setDate(d.getDate() + parseInt(nextDays, 10));
           nextControl = d.toISOString().slice(0, 10);
         }
 
-        const t = {
+        var baseProduct = productSelect ? productSelect.value : "";
+        var extraProduct = productOther ? productOther.value.trim() : "";
+        var productText = "";
+        if (baseProduct && extraProduct) {
+          productText = baseProduct + " + " + extraProduct;
+        } else if (baseProduct) {
+          productText = baseProduct;
+        } else {
+          productText = extraProduct;
+        }
+
+        var t = {
           id: Date.now(),
-          cowNumber,
-          date,
-          diagnosis,
+          cowNumber: cowNumber,
+          date: date,
+          diagnosis: diagnosis,
           leg: document.getElementById("treat-leg").value,
           block: document.getElementById("treat-block").value,
           bandage: document.getElementById("treat-bandage").value,
-          product: document.getElementById("treat-product").value.trim(),
-          nextControl,
+          product: productText,
+          nextControl: nextControl,
           notes: document.getElementById("treat-notes").value.trim()
         };
         addTreatment(t);
@@ -800,92 +905,101 @@
         renderDayOverview(dayDate.value);
       });
 
-      historyCow.addEventListener("change", () => {
+      historyCow.addEventListener("change", function () {
         renderHistory(historyCow.value);
       });
 
-      dayShow.addEventListener("click", () => {
+      dayShow.addEventListener("click", function () {
         renderDayOverview(dayDate.value);
       });
 
-      dayPrint.addEventListener("click", () => {
-        const data = loadData();
-        const dateISO = dayDate.value || getTodayISO();
-        const behandlungen = data.treatments.filter((t) => t.date === dateISO);
-        const win = window.open("", "_blank");
-        const rows = behandlungen
-          .map((t) => {
-            const cow = data.cows.find((c) => c.number === t.cowNumber);
-            return `
-              <tr>
-                <td>${cow?.farm || ""}</td>
-                <td>${t.cowNumber || ""}</td>
-                <td>${t.date || ""}</td>
-                <td>${t.diagnosis || ""}</td>
-                <td>${t.leg || ""}</td>
-                <td>${t.block || ""}</td>
-                <td>${t.bandage || ""}</td>
-                <td>${t.product || ""}</td>
-                <td>${t.nextControl || ""}</td>
-              </tr>
-            `;
+      dayPrint.addEventListener("click", function () {
+        var data = loadData();
+        var dateISO = dayDate.value || getTodayISO();
+        var behandlungen = data.treatments.filter(function (t) {
+          return t.date === dateISO;
+        });
+        var win = window.open("", "_blank");
+        var rows = behandlungen
+          .map(function (t) {
+            var cow = null;
+            for (var i = 0; i < data.cows.length; i++) {
+              if (data.cows[i].number === t.cowNumber) {
+                cow = data.cows[i];
+                break;
+              }
+            }
+            var farmName = cow ? cow.farm || "" : "";
+            return (
+              "<tr>" +
+              "<td>" +
+              farmName +
+              "</td>" +
+              "<td>" +
+              (t.cowNumber || "") +
+              "</td>" +
+              "<td>" +
+              (t.date || "") +
+              "</td>" +
+              "<td>" +
+              (t.diagnosis || "") +
+              "</td>" +
+              "<td>" +
+              (t.leg || "") +
+              "</td>" +
+              "<td>" +
+              (t.block || "") +
+              "</td>" +
+              "<td>" +
+              (t.bandage || "") +
+              "</td>" +
+              "<td>" +
+              (t.product || "") +
+              "</td>" +
+              "<td>" +
+              (t.nextControl || "") +
+              "</td>" +
+              "</tr>"
+            );
           })
           .join("");
 
-        win.document.write(`
-          <html>
-          <head>
-            <meta charset="UTF-8" />
-            <title>Klauenpflege Bericht ${dateISO}</title>
-            <style>
-              body { font-family: system-ui, sans-serif; padding: 1.5rem; }
-              h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }
-              h2 { font-size: 1rem; margin-bottom: 0.8rem; }
-              .header-bar {
-                padding: 0.8rem 1rem;
-                border-radius: 0.75rem;
-                background: linear-gradient(135deg,#0f766e,#22c55e);
-                color:#fff;
-                margin-bottom: 1rem;
-              }
-              table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-              th, td { border: 1px solid #e5e7eb; padding: 0.4rem; text-align:left; }
-              th { background:#f3f4f6; }
-            </style>
-          </head>
-          <body>
-            <div class="header-bar">
-              <h1>Valiev Klauenpflege Service</h1>
-              <div>Klauenpflege-Bericht – ${dateISO}</div>
-              <div>Bakhtovar Valiev – Mobil in Friesland / Umgebung</div>
-            </div>
-            <h2>Behandlungen an diesem Tag</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Hof</th>
-                  <th>Kuh</th>
-                  <th>Datum</th>
-                  <th>Diagnose</th>
-                  <th>Fuß</th>
-                  <th>Block</th>
-                  <th>Verband</th>
-                  <th>Produkt</th>
-                  <th>Nächste Kontrolle</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rows || "<tr><td colspan='9'>Keine Behandlungen erfasst.</td></tr>"}
-              </tbody>
-            </table>
-          </body>
-          </html>
-        `);
+        win.document.write(
+          "<html><head><meta charset='UTF-8' />" +
+            "<title>Klauenpflege Bericht " +
+            dateISO +
+            "</title>" +
+            "<style>" +
+            "body { font-family: system-ui, sans-serif; padding: 1.5rem; }" +
+            "h1 { font-size: 1.4rem; margin-bottom: 0.2rem; }" +
+            "h2 { font-size: 1rem; margin-bottom: 0.8rem; }" +
+            ".header-bar { padding: 0.8rem 1rem; border-radius: 0.75rem;" +
+            "background: linear-gradient(135deg,#0f766e,#22c55e); color:#fff;" +
+            "margin-bottom: 1rem; }" +
+            "table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }" +
+            "th, td { border: 1px solid #e5e7eb; padding: 0.4rem; text-align:left; }" +
+            "th { background:#f3f4f6; }" +
+            "</style></head><body>" +
+            "<div class='header-bar'>" +
+            "<h1>Valiev Klauenpflege Service</h1>" +
+            "<div>Klauenpflege-Bericht – " +
+            dateISO +
+            "</div>" +
+            "<div>Bakhtovar Valiev – Mobil in Friesland / Umgebung</div>" +
+            "</div>" +
+            "<h2>Behandlungen an diesem Tag</h2>" +
+            "<table><thead><tr>" +
+            "<th>Hof</th><th>Kuh</th><th>Datum</th><th>Diagnose</th>" +
+            "<th>Fuß</th><th>Block</th><th>Verband</th><th>Produkt</th><th>Nächste Kontrolle</th>" +
+            "</tr></thead><tbody>" +
+            (rows || "<tr><td colspan='9'>Keine Behandlungen erfasst.</td></tr>") +
+            "</tbody></table></body></html>"
+        );
         win.document.close();
         win.focus();
       });
 
-      clearAllBtn.addEventListener("click", () => {
+      clearAllBtn.addEventListener("click", function () {
         if (
           confirm(
             "Alle Kühe und Behandlungen auf diesem Gerät löschen? Diese Aktion kann nicht rückgängig gemacht werden."
@@ -899,29 +1013,29 @@
         }
       });
 
-      backupExport.addEventListener("click", () => {
-        const data = loadData();
-        const blob = new Blob([JSON.stringify(data, null, 2)], {
+      backupExport.addEventListener("click", function () {
+        var data = loadData();
+        var blob = new Blob([JSON.stringify(data, null, 2)], {
           type: "application/json"
         });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
         a.href = url;
-        const today = getTodayISO();
-        a.download = valiev-klauenpflege-backup-${today}.json;
+        var today = getTodayISO();
+        a.download = "valiev-klauenpflege-backup-" + today + ".json";
         a.click();
         URL.revokeObjectURL(url);
         backupMsg.textContent = "Backup-Datei wurde erstellt.";
         backupMsg.className = "msg msg-success";
       });
 
-      backupImportInput.addEventListener("change", (e) => {
-        const file = e.target.files?.[0];
+      backupImportInput.addEventListener("change", function (e) {
+        var file = e.target.files && e.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
+        var reader = new FileReader();
+        reader.onload = function (ev) {
           try {
-            const parsed = JSON.parse(ev.target.result);
+            var parsed = JSON.parse(ev.target.result);
             saveData({
               cows: parsed.cows || [],
               treatments: parsed.treatments || []
