@@ -185,7 +185,8 @@
       font-size: 0.85rem;
     }
 
-    th, td {
+    th,
+    td {
       padding: 0.45rem 0.35rem;
       border-bottom: 1px solid #e5e7eb;
       text-align: left;
@@ -210,6 +211,67 @@
       color: #6b7280;
       padding: 1.5rem 1rem 2rem;
     }
+
+    /* Form */
+
+    form {
+      margin-top: 0.7rem;
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    input,
+    select,
+    textarea {
+      border-radius: 0.6rem;
+      border: 1px solid #d1d5db;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #059669;
+      box-shadow: 0 0 0 1px #6ee7b7;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    .msg {
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+    }
+
+    .msg-success {
+      color: #065f46;
+    }
+
+    .msg-error {
+      color: #b91c1c;
+    }
   </style>
 </head>
 <body>
@@ -223,7 +285,7 @@
     <section class="card">
       <h2>Mobiler Klauenpfleger für Milchviehbetriebe<span class="badge">Niedersachsen</span></h2>
       <p style="font-size: 0.95rem; margin-top: 0.4rem;">
-        Ich bin <strong>Bakhtovar Valiev</strong>, selbst aktiver Klauenpfleger und Landwirt.  
+        Ich bin <strong>Bakhtovar Valiev</strong>, professioneller Klauenpfleger mit agrarwissenschaftlichem Hintergrund.
         Ich unterstütze Betriebe bei:
       </p>
       <ul style="margin-top: 0.5rem;">
@@ -232,12 +294,37 @@
         <li>dokumentierter Klauenpflege für jedes Tier</li>
       </ul>
 
+      <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+        Ich fahre auch zu kleineren Beständen (ab ca. 10 Kühen) sowie zu größeren Milchviehbetrieben
+        bis 80–100+ Kühen in der Umgebung.
+      </p>
+
       <div class="cta-buttons">
-        <!-- ЗАМЕНИ НОМЕР НА СВОЙ -->
-        <a class="btn btn-primary" href="tel:+4915112345678">Jetzt anrufen</a>
-        <!-- ЗАМЕНИ WHATSAPP-LINK НА СВОЙ -->
-        <a class="btn btn-ghost" href="https://wa.me/4915112345678" target="_blank">WhatsApp Anfrage</a>
+        <a class="btn btn-primary" href="tel:+4915901686635">Jetzt anrufen</a>
+        <a
+          class="btn btn-ghost"
+          href="https://wa.me/4915901686635"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp Anfrage
+        </a>
       </div>
+    </section>
+
+    <!-- Über mich -->
+    <section class="card">
+      <h2>Über mich – Bakhtovar Valiev</h2>
+      <ul>
+        <li>Abschluss an einer Agraruniversität (Agrarwissenschaften)</li>
+        <li>Praxisjahr auf verschiedenen Milchviehbetrieben in Deutschland</li>
+        <li>über 3,5 Jahre Berufserfahrung als professioneller Klauenpfleger</li>
+        <li>Weiterbildung mit Schwerpunkt Klauenpflege &amp; Klauenmanagement</li>
+      </ul>
+      <p style="font-size: 0.9rem; margin-top: 0.5rem;">
+        Mir ist wichtig, dass die Tiere lahmheitsfrei laufen können und der Betrieb eine klare, nachvollziehbare
+        Dokumentation über den Zustand der Klauen hat.
+      </p>
     </section>
 
     <!-- Leistungen & Regionen -->
@@ -264,10 +351,10 @@
         <div class="value">Friesland, Wilhelmshaven, Sande, Umgebung</div>
 
         <div class="label" style="margin-top: 0.6rem;">Betriebsgröße</div>
-        <div class="value">Kleine Familienbetriebe bis große Milchviehbestände</div>
+        <div class="value">Von kleineren Beständen ab ca. 10 Kühen bis große Milchviehbetriebe (80–100+ Kühe)</div>
 
         <div class="label" style="margin-top: 0.6rem;">Sprache</div>
-        <div class="value">Deutsch, Russisch, Tadschikisch</div>
+        <div class="value">Deutsch, Russisch, Tadschikisch, Persisch</div>
       </div>
     </section>
 
@@ -316,7 +403,7 @@
       </div>
     </section>
 
-    <!-- Info für Landwirte -->
+    <!-- Warum regelmäßige Klauenpflege -->
     <section class="card">
       <h2>Warum regelmäßige Klauenpflege wichtig ist</h2>
       <ul>
@@ -327,17 +414,94 @@
       </ul>
     </section>
 
+    <!-- Termin-Anfrage -->
+    <section class="card" id="termin">
+      <h2>Termin online anfragen</h2>
+      <p style="font-size: 0.9rem; margin-top: 0.4rem;">
+        Sie können hier Ihre Daten für einen gewünschten Termin hinterlassen. Ich melde mich zur Bestätigung telefonisch
+        oder per WhatsApp zurück.
+      </p>
+      <p class="hint" style="margin-top: 0.3rem;">
+        Hinweis: In dieser Testversion werden die Angaben nur lokal auf diesem Gerät gespeichert. Für eine verbindliche
+        Terminvereinbarung bitte zusätzlich anrufen oder per WhatsApp schreiben.
+      </p>
+
+      <form id="appointment-form">
+        <div class="field-group">
+          <label for="farmer-name">Name / Ansprechpartner</label>
+          <input id="farmer-name" type="text" required />
+        </div>
+
+        <div class="field-group">
+          <label for="farm-name">Betrieb / Hofname</label>
+          <input id="farm-name" type="text" />
+        </div>
+
+        <div class="field-group">
+          <label for="location">Ort / Postleitzahl</label>
+          <input id="location" type="text" required />
+        </div>
+
+        <div class="field-group">
+          <label for="phone">Telefon / Handy</label>
+          <input id="phone" type="tel" placeholder="+49 ..." />
+        </div>
+
+        <div class="field-group">
+          <label for="cow-count">Anzahl Kühe</label>
+          <input id="cow-count" type="number" min="1" placeholder="z.B. 20, 60, 100" />
+        </div>
+
+        <div class="field-group">
+          <label for="weekday">Wunschtag (Mo–Fr)</label>
+          <select id="weekday">
+            <option value="">Bitte wählen</option>
+            <option value="Montag">Montag</option>
+            <option value="Dienstag">Dienstag</option>
+            <option value="Mittwoch">Mittwoch</option>
+            <option value="Donnerstag">Donnerstag</option>
+            <option value="Freitag">Freitag</option>
+          </select>
+          <span class="hint">Genauer Termin wird telefonisch abgestimmt.</span>
+        </div>
+
+        <div class="field-group">
+          <label for="notes">Bemerkung / besondere Hinweise</label>
+          <textarea id="notes" placeholder="z.B. akute Lahmheiten, Mortellaro, gewünschte Uhrzeit"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Terminanfrage speichern</button>
+        <div id="form-message" class="msg"></div>
+      </form>
+
+      <div class="table-wrapper" id="appointments-wrapper" style="display: none; margin-top: 1rem;">
+        <table id="appointments-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Betrieb</th>
+              <th>Ort</th>
+              <th>Kühe</th>
+              <th>Tag</th>
+              <th>Notiz</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Kontaktblock -->
     <section class="card">
-      <h2>Kontakt & Terminvereinbarung</h2>
+      <h2>Kontakt &amp; Terminvereinbarung</h2>
       <p style="font-size: 0.9rem; margin-top: 0.4rem;">
-        Rufen Sie an oder schreiben Sie per WhatsApp.  
-        Ich melde mich in der Regel noch am selben Tag zurück.
+        Am einfachsten erreichen Sie mich telefonisch oder per WhatsApp. Ich melde mich in der Regel noch am selben Tag
+        zurück.
       </p>
 
       <div style="margin-top: 0.6rem;">
         <div class="label">Telefon</div>
-        <div class="value">+49 151 12345678</div>
+        <div class="value">+49 1590 1686635</div>
 
         <div class="label" style="margin-top: 0.4rem;">E-Mail</div>
         <div class="value">info@valiev-klauenservice.de</div>
@@ -347,8 +511,15 @@
       </div>
 
       <div class="cta-buttons">
-        <a class="btn btn-primary" href="tel:+4915112345678">Termin anfragen</a>
-        <a class="btn btn-ghost" href="https://wa.me/4915112345678" target="_blank">Nachricht per WhatsApp</a>
+        <a class="btn btn-primary" href="tel:+4915901686635">Direkt anrufen</a>
+        <a
+          class="btn btn-ghost"
+          href="https://wa.me/4915901686635"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp Nachricht
+        </a>
       </div>
     </section>
   </main>
@@ -366,6 +537,101 @@
           .catch((err) => console.log("Service Worker Fehler:", err));
       });
     }
+
+    // Einfache Termin-Speicherung im localStorage (Testversion)
+    const STORAGE_KEY = "vkps_appointments_v1";
+
+    function loadAppointments() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        console.error("Fehler beim Lesen aus localStorage", e);
+        return [];
+      }
+    }
+
+    function saveAppointments(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        console.error("Fehler beim Speichern in localStorage", e);
+      }
+    }
+
+    function renderAppointments() {
+      const appointments = loadAppointments();
+      const wrapper = document.getElementById("appointments-wrapper");
+      const tbody = document.querySelector("#appointments-table tbody");
+
+      if (!wrapper || !tbody) return;
+
+      tbody.innerHTML = "";
+
+      if (!appointments.length) {
+        wrapper.style.display = "none";
+        return;
+      }
+
+      appointments.forEach((a) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${a.name || ""}</td>
+          <td>${a.farm || ""}</td>
+          <td>${a.location || ""}</td>
+          <td>${a.cows || ""}</td>
+          <td>${a.weekday || ""}</td>
+          <td>${a.notes || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      wrapper.style.display = "block";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("appointment-form");
+      const msg = document.getElementById("form-message");
+      if (!form) return;
+
+      renderAppointments();
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("farmer-name").value.trim();
+        const farm = document.getElementById("farm-name").value.trim();
+        const location = document.getElementById("location").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const cows = document.getElementById("cow-count").value;
+        const weekday = document.getElementById("weekday").value;
+        const notes = document.getElementById("notes").value.trim();
+
+        if (!name || !location) {
+          msg.textContent = "Bitte füllen Sie mindestens Name und Ort aus.";
+          msg.className = "msg msg-error";
+          return;
+        }
+
+        const appointments = loadAppointments();
+        appointments.push({
+          name,
+          farm,
+          location,
+          phone,
+          cows,
+          weekday,
+          notes,
+          createdAt: new Date().toISOString()
+        });
+        saveAppointments(appointments);
+
+        form.reset();
+        renderAppointments();
+        msg.textContent = "Terminanfrage wurde gespeichert (lokal auf diesem Gerät).";
+        msg.className = "msg msg-success";
+      });
+    });
   </script>
 </body>
 </html>
