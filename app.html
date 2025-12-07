@@ -2,11 +2,11 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Valiev Klauenpflege – Arbeitsmodus</title>
+  <title>Valiev Klauenpflege – Arbeitsmodus (Offline)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="Interne Klauenpflege-App für Bakhtovar Valiev – Kühe, Diagnosen, Behandlungen, Tagesberichte und Backup."
+    content="Interne Klauenpflege-App für Bakhtovar Valiev – Kühe, Diagnosen, Behandlungen, Fotos, Tagesberichte und Backup."
   />
 
   <link rel="manifest" href="manifest.json" />
@@ -262,7 +262,7 @@
 </head>
 <body>
   <header>
-    <h1>VALIEV KLAUENPFLEGE – APP</h1>
+    <h1>VALIEV KLAUENPFLEGE – APP (Offline)</h1>
     <p>Interner Arbeitsmodus für Bakhtovar (Tablet / Smartphone)</p>
   </header>
 
@@ -326,8 +326,7 @@
     <section class="card">
       <div class="section-title">2. Behandlung eintragen</div>
       <p class="muted">
-        Behandlung mit Diagnose, Fuß, Block, Verband, Produkt und nächster Kontrolle
-        dokumentieren.
+        Behandlung mit Diagnose, Fuß, Block, Verband, Produkt, Fotos und nächster Kontrolle dokumentieren.
       </p>
 
       <form id="treat-form">
@@ -384,7 +383,23 @@
           </div>
         </div>
 
-        <div class="inline-row">
+        <!-- ШАБЛОНЫ ОДНИМ НАЖАТИЕМ -->
+        <div class="btn-row" id="template-buttons" style="margin-top:0.4rem;">
+          <button type="button" class="btn btn-ghost" data-template="mortellaro">
+            Mortellaro – Standard
+          </button>
+          <button type="button" class="btn btn-ghost" data-template="weisse-linie">
+            Weiße Linie – leicht
+          </button>
+          <button type="button" class="btn btn-ghost" data-template="sohle-schwer">
+            Sohlengeschwür – schwer
+          </button>
+        </div>
+        <span class="muted">
+          Tippe auf einen Button, um Diagnose, Block, Verband, Produkt und Kontrolle automatisch zu setzen.
+        </span>
+
+        <div class="inline-row" style="margin-top:0.5rem;">
           <div class="field-group">
             <label for="treat-bandage">Verband?</label>
             <select id="treat-bandage">
@@ -437,6 +452,30 @@
           </div>
         </div>
 
+        <!-- ФОТО ДО / ПОСЛЕ -->
+        <div class="inline-row">
+          <div class="field-group">
+            <label for="photo-before">Foto VOR der Behandlung</label>
+            <input
+              id="photo-before"
+              type="file"
+              accept="image/*"
+              capture="environment"
+            />
+            <span class="muted">Optional – Huf vor dem Beschneiden / Behandlung</span>
+          </div>
+          <div class="field-group">
+            <label for="photo-after">Foto NACH der Behandlung</label>
+            <input
+              id="photo-after"
+              type="file"
+              accept="image/*"
+              capture="environment"
+            />
+            <span class="muted">Optional – Ergebnis nach der Behandlung</span>
+          </div>
+        </div>
+
         <div class="btn-row">
           <button type="submit" class="btn btn-primary">Behandlung speichern</button>
         </div>
@@ -448,7 +487,7 @@
     <section class="card">
       <div class="section-title">3. Kuh-Historie anzeigen</div>
       <p class="muted">
-        Alle Behandlungen einer bestimmten Kuh sehen.
+        Alle Behandlungen einer bestimmten Kuh sehen (inkl. Foto-Buttons).
       </p>
 
       <div class="field-group" style="margin-top:0.4rem;">
@@ -468,7 +507,7 @@
               <th>Block</th>
               <th>Verband</th>
               <th>Produkt</th>
-              <th>Bemerkung</th>
+              <th>Bemerkung / Fotos</th>
             </tr>
           </thead>
           <tbody id="history-body"></tbody>
@@ -547,8 +586,7 @@
     <section class="card">
       <div class="section-title">6. Datenverwaltung / Backup</div>
       <p class="muted">
-        Alle Daten werden lokal im Browser gespeichert (localStorage). Kein Internet, kein
-        Server – nur auf diesem Gerät. Backup hilft beim Gerätewechsel.
+        Alle Daten werden lokal im Browser gespeichert (localStorage). Backup hilft beim Gerätewechsel.
       </p>
 
       <div class="btn-row" style="margin-top:0.6rem;">
@@ -572,11 +610,11 @@
   </main>
 
   <footer>
-    © 2025 Valiev Klauenpflege Service – Interne Arbeits-App.
+    © 2025 Valiev Klauenpflege Service – Interne Arbeits-App (Offline, mit Fotos).
   </footer>
 
   <script>
-    // Service Worker
+    // Service Worker (PWA / Offline Shell)
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
         navigator.serviceWorker
@@ -587,7 +625,7 @@
       });
     }
 
-    var STORAGE_KEY = "vkps_data_v1";
+    var STORAGE_KEY = "vkps_data_v2_photos";
 
     function loadData() {
       try {
@@ -658,7 +696,7 @@
           .forEach(function (c) {
             var opt = document.createElement("option");
             opt.value = c.number;
-            opt.textContent = c.number + " – " + (c.farm || "");
+            opt.textContent = c.number + (c.farm ? " – " + c.farm : "");
             sel.appendChild(opt);
           });
         if (current) sel.value = current;
@@ -705,6 +743,7 @@
       if (!tbody) return;
       tbody.innerHTML = "";
       if (!cowNumber) return;
+
       var data = loadData();
       data.treatments
         .filter(function (t) {
@@ -714,6 +753,20 @@
           return (a.date || "").localeCompare(b.date || "");
         })
         .forEach(function (t) {
+          var fotoButtons = "";
+          if (t.photoBefore) {
+            fotoButtons +=
+              "<br><button class='btn btn-ghost' style='padding:0.2rem 0.5rem;font-size:0.7rem;' onclick='VKP_showPhoto(\"before\"," +
+              t.id +
+              ")'>Foto vor</button>";
+          }
+          if (t.photoAfter) {
+            fotoButtons +=
+              "<br><button class='btn btn-ghost' style='padding:0.2rem 0.5rem;font-size:0.7rem;' onclick='VKP_showPhoto(\"after\"," +
+              t.id +
+              ")'>Foto nach</button>";
+          }
+
           var tr = document.createElement("tr");
           tr.innerHTML =
             "<td>" +
@@ -726,16 +779,17 @@
             (t.leg || "") +
             "</td>" +
             "<td>" +
-            (t.block || "") +
+            (t.block === "ja" || t.block === true ? "Ja" : "Nein") +
             "</td>" +
             "<td>" +
-            (t.bandage || "") +
+            (t.bandage === "ja" || t.bandage === true ? "Ja" : "Nein") +
             "</td>" +
             "<td>" +
             (t.product || "") +
             "</td>" +
             "<td>" +
             (t.notes || "") +
+            fotoButtons +
             "</td>";
           tbody.appendChild(tr);
         });
@@ -746,6 +800,7 @@
       if (!tbody) return;
       tbody.innerHTML = "";
       if (!dateISO) return;
+
       var data = loadData();
       data.treatments
         .filter(function (t) {
@@ -778,10 +833,10 @@
             (t.leg || "") +
             "</td>" +
             "<td>" +
-            (t.block || "") +
+            (t.block === "ja" || t.block === true ? "Ja" : "Nein") +
             "</td>" +
             "<td>" +
-            (t.bandage || "") +
+            (t.bandage === "ja" || t.bandage === true ? "Ja" : "Nein") +
             "</td>" +
             "<td>" +
             (t.product || "") +
@@ -791,6 +846,77 @@
             "</td>";
           tbody.appendChild(tr);
         });
+    }
+
+    // конвертация файла в base64 для хранения
+    function fileToDataURL(file) {
+      return new Promise(function (resolve, reject) {
+        if (!file) {
+          resolve(null);
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          resolve(e.target.result);
+        };
+        reader.onerror = function (e) {
+          reject(e);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // просмотр фото в новом окне
+    function VKP_showPhoto(which, treatmentId) {
+      var data = loadData();
+      var t = data.treatments.find(function (x) {
+        return x.id === treatmentId;
+      });
+      if (!t) return;
+      var src = which === "before" ? t.photoBefore : t.photoAfter;
+      if (!src) return;
+      var w = window.open("", "_blank");
+      w.document.write(
+        "<html><head><title>Foto " +
+          which +
+          "</title></head><body style='margin:0;background:#000;'>" +
+          "<img src='" +
+          src +
+          "' style='width:100%;height:auto;display:block;' />" +
+          "</body></html>"
+      );
+      w.document.close();
+    }
+
+    // применение шаблонов (один клик)
+    function applyTemplate(key) {
+      var diag = document.getElementById("treat-diagnosis");
+      var block = document.getElementById("treat-block");
+      var bandage = document.getElementById("treat-bandage");
+      var productSelect = document.getElementById("treat-product-select");
+      var next = document.getElementById("treat-next");
+
+      if (!diag || !block || !bandage || !productSelect || !next) return;
+
+      if (key === "mortellaro") {
+        diag.value = "Mortellaro (Dermatitis digitalis)";
+        block.value = "nein";
+        bandage.value = "ja";
+        productSelect.value = "Blau-Spray";
+        next.value = "14";
+      } else if (key === "weisse-linie") {
+        diag.value = "Weiße-Linie-Defekt";
+        block.value = "ja";
+        bandage.value = "ja";
+        productSelect.value = "Holzklotz";
+        next.value = "28";
+      } else if (key === "sohle-schwer") {
+        diag.value = "Sohlengeschwür";
+        block.value = "ja";
+        bandage.value = "ja";
+        productSelect.value = "Schwarze Salbe";
+        next.value = "14";
+      }
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -813,6 +939,7 @@
       var productSelect = document.getElementById("treat-product-select");
       var productOther = document.getElementById("treat-product-other");
 
+      // показ/скрытие доп. продукта
       if (productSelect && productOther) {
         productSelect.addEventListener("change", function () {
           if (productSelect.value === "Sonstiges") {
@@ -823,6 +950,15 @@
           }
         });
       }
+
+      // шаблоны
+      var templateButtons = document.querySelectorAll("#template-buttons button");
+      templateButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var key = btn.getAttribute("data-template");
+          applyTemplate(key);
+        });
+      });
 
       refreshCowSelects();
       renderCowList();
@@ -854,8 +990,11 @@
         renderCowList();
       });
 
-      treatForm.addEventListener("submit", function (e) {
+      treatForm.addEventListener("submit", async function (e) {
         e.preventDefault();
+        treatMsg.textContent = "";
+        treatMsg.className = "msg";
+
         var cowNumber = document.getElementById("treat-cow").value;
         var date = document.getElementById("treat-date").value;
         var diagnosis = document.getElementById("treat-diagnosis").value;
@@ -885,6 +1024,12 @@
           productText = extraProduct;
         }
 
+        // фото
+        var beforeFile = document.getElementById("photo-before").files[0];
+        var afterFile = document.getElementById("photo-after").files[0];
+        var photoBefore = await fileToDataURL(beforeFile);
+        var photoAfter = await fileToDataURL(afterFile);
+
         var t = {
           id: Date.now(),
           cowNumber: cowNumber,
@@ -895,10 +1040,14 @@
           bandage: document.getElementById("treat-bandage").value,
           product: productText,
           nextControl: nextControl,
-          notes: document.getElementById("treat-notes").value.trim()
+          notes: document.getElementById("treat-notes").value.trim(),
+          photoBefore: photoBefore,
+          photoAfter: photoAfter
         };
+
         addTreatment(t);
-        treatMsg.textContent = "Behandlung wurde gespeichert.";
+        treatMsg.textContent =
+          "Behandlung wurde gespeichert (inkl. Fotos, falls gewählt).";
         treatMsg.className = "msg msg-success";
 
         renderHistory(historyCow.value);
@@ -948,10 +1097,10 @@
               (t.leg || "") +
               "</td>" +
               "<td>" +
-              (t.block || "") +
+              (t.block === 'ja' || t.block === true ? "Ja" : "Nein") +
               "</td>" +
               "<td>" +
-              (t.bandage || "") +
+              (t.bandage === 'ja' || t.bandage === true ? "Ja" : "Nein") +
               "</td>" +
               "<td>" +
               (t.product || "") +
