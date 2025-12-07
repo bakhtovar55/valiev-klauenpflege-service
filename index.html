@@ -1,1070 +1,371 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-    <title>Valiev Klauenpflege Service – App</title>
+  <meta charset="UTF-8" />
+  <title>Valiev Klauenpflege Service</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Professionelle Klauenpflege für Milchviehbetriebe in Niedersachsen. Mobiler Service von Bakhtovar Valiev."
+  />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f766e" />
 
-    <!-- ВАЖНО: подключаем манифест -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#047857">
-
-    <style>
-        /* ---------- ОБЩИЙ ДИЗАЙН ПРИЛОЖЕНИЯ ---------- */
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #f3f4f6;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: #047857;
-            color: white;
-            padding: 10px 16px;
-            text-align: center;
-        }
-        header h1 {
-            margin: 4px 0;
-            font-size: 20px;
-        }
-        header p {
-            margin: 0;
-            font-size: 12px;
-            opacity: 0.9;
-        }
-        .header-sub {
-            font-size: 11px;
-            opacity: 0.85;
-        }
-        #connectionStatus {
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        main {
-            max-width: 900px;
-            margin: 12px auto 40px;
-            padding: 0 10px;
-        }
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-        }
-        .card h2 {
-            margin-top: 0;
-            font-size: 16px;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 6px;
-        }
-        label {
-            display: block;
-            font-size: 13px;
-            margin-top: 6px;
-        }
-        input, select, textarea {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 6px 8px;
-            margin-top: 2px;
-            border-radius: 4px;
-            border: 1px solid #d1d5db;
-            font-size: 13px;
-        }
-        textarea {
-            min-height: 60px;
-            resize: vertical;
-        }
-        button {
-            margin-top: 10px;
-            padding: 8px 14px;
-            border-radius: 6px;
-            border: none;
-            background: #047857;
-            color: white;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        button.secondary {
-            background: #374151;
-        }
-        button.danger {
-            background: #b91c1c;
-        }
-        button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-        .row {
-            display: flex;
-            gap: 8px;
-        }
-        .row > div {
-            flex: 1;
-        }
-        .info {
-            font-size: 12px;
-            color: #6b7280;
-        }
-        .badge {
-            display: inline-block;
-            padding: 2px 6px;
-            border-radius: 999px;
-            font-size: 11px;
-            background: #e5e7eb;
-            margin-right: 4px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 6px;
-            font-size: 12px;
-        }
-        th, td {
-            border: 1px solid #e5e7eb;
-            padding: 4px 6px;
-            text-align: left;
-        }
-        th {
-            background: #f9fafb;
-        }
-        .msg {
-            font-size: 13px;
-            margin-top: 6px;
-        }
-        .msg.ok {
-            color: #047857;
-        }
-        .msg.err {
-            color: #b91c1c;
-        }
-        @media (max-width: 600px) {
-            .row {
-                flex-direction: column;
-            }
-        }
-/* ---- ДИЗАЙН TAGESBERICHT / PDF (экран + печать) --------- */
-
-#reportArea {
-    margin-top: 12px;
-}
-
-/* рамка вокруг отчёта */
-.report-container {
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 12px 14px;
-    background: #ffffff;
-}
-/* зелёная линия под шапкой отчёта – на экране зелёная */
-.report-header-line {
-    width: 100%;
-    height: 0;
-    border-top: 3px solid #047857;   /* зелёный на экране */
-    margin: 6px 0 10px;
-}
-
-/* при печати – гарантированно чёрная линия, чтобы её было видно */
-@media print {
-    .report-header-line {
-        border-top: 2px solid #047857 !important;
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-}
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 12px 14px;
-            background: #ffffff;
-            font-size: 12px;
-        }
 
-        .report-header {
-            margin-bottom: 6px;
-        }
+    body {
+      background: #f3f4f6;
+      color: #111827;
+      line-height: 1.5;
+    }
 
-        .report-title-row {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 8px;
-        }
+    header {
+      background: linear-gradient(135deg, #0f766e, #22c55e);
+      color: white;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-        .report-header-icon {
-            font-size: 18px;
-            margin-right: 4px;
-        }
+    header h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-        .report-title-main {
-            font-size: 16px;
-            font-weight: 700;
-            color: #047857;
-        }
+    header p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
 
-        .report-title-date {
-            font-size: 12px;
-            color: #6b7280;
-        }
+    main {
+      max-width: 960px;
+      margin: 1.5rem auto;
+      padding: 0 1rem 2rem;
+    }
 
-        .report-subtitle {
-            font-size: 11px;
-            color: #6b7280;
-        }
+    .card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.2rem 1.3rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
 
-        .report-divider {
-            margin: 6px 0 8px;
-            height: 2px;
-            background: #047857;  /* зелёная полоса под заголовком */
-            border-radius: 2px;
-        }
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.6rem;
+      color: #065f46;
+    }
 
-        .report-meta {
-            font-size: 11px;
-            margin-bottom: 6px;
-        }
-        .report-meta span {
-            display: inline-block;
-            margin-right: 18px;
-        }
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      background: #d1fae5;
+      color: #065f46;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-left: 0.4rem;
+    }
 
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 4px;
-            font-size: 12px;
-        }
-        .report-table th,
-        .report-table td {
-            border: 1px solid #e5e7eb;
-            padding: 4px 6px;
-            text-align: left;
-        }
-        .report-table th {
-            background: #f3f4f6;
-        }
-        .report-table tbody tr:nth-child(even) {
-            background: #f9fafb;
-        }
-        .report-table th:nth-child(3),
-        .report-table th:nth-child(6),
-        .report-table th:nth-child(7),
-        .report-table td:nth-child(3),
-        .report-table td:nth-child(6),
-        .report-table td:nth-child(7) {
-            text-align: center;
-        }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
 
-        .report-footer {
-            margin-top: 10px;
-            font-size: 11px;
-            color: #4b5563;
-        }
+    @media (min-width: 720px) {
+      .grid-2 {
+        grid-template-columns: 1.2fr 1fr;
+      }
+    }
 
-        /* ---------- ПЕЧАТЬ (PDF) ---------- */
-        @media print {
-            body {
-                background: #ffffff;
-            }
-            header {
-                margin-bottom: 10px;
-            }
-            /* скрываем обычные карточки, показываем только отчёт */
-            section.card {
-                display: none;
-            }
-            section.card#reportCard {
-                display: block;
-                box-shadow: none;
-                border-radius: 0;
-                margin: 0;
-            }
-            .report-table {
-                font-size: 11px;
-            }
-        }
-    </style>
+    ul {
+      margin-left: 1.1rem;
+      font-size: 0.95rem;
+    }
+
+    ul li {
+      margin-bottom: 0.3rem;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .pill {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: #e5e7eb;
+    }
+
+    .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #059669;
+      color: white;
+      box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: #047857;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(5, 150, 105, 0.4);
+    }
+
+    .btn-ghost {
+      background: white;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .btn-ghost:hover {
+      background: #ecfeff;
+      transform: translateY(-1px);
+    }
+
+    .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-bottom: 0.2rem;
+    }
+
+    .value {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 0.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 0.45rem 0.35rem;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #6b7280;
+      padding: 1.5rem 1rem 2rem;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>Valiev Klauenpflege Service</h1>
+    <p>Professionelle Klauenpflege &amp; Klauenmanagement in Niedersachsen</p>
+  </header>
 
-<header>
-    <h1>🐄 Valiev Klauenpflege Service</h1>
-    <p id="connectionStatus">Status wird geladen…</p>
-    <p class="header-sub">
-        Digitale Klauenpflege-Dokumentation & transparente Behandlungsberichte für landwirtschaftliche Betriebe und Milchviehhalter
-    </p>
-    <p class="header-sub">
-        Digitale Klauenpflege-Software für Dokumentation, Kontrolle und Auswertung
-    </p>
-</header>
-
-<main>
-
-    <!-- 1. KUH HINZUFÜGEN / BEARBEITEN -->
+  <main>
+    <!-- Hero / Kontakt -->
     <section class="card">
-        <h2>1. Kuh hinzufügen / bearbeiten</h2>
-        <div class="row">
-            <div>
-                <label>Kuh Nummer</label>
-                <input id="cowNumber" placeholder="z.B. 245">
-            </div>
-            <div>
-                <label>Hof / Betrieb</label>
-                <input id="farmName" placeholder="z.B. Hof Müller">
-            </div>
-        </div>
-        <div class="row">
-            <div>
-                <label>Geburtsdatum</label>
-                <input id="birthDate" placeholder="z.B. 12.02.2022">
-            </div>
-            <div>
-                <label>Aktuell lahm?</label>
-                <select id="lameStatus">
-                    <option value="">Nein / unbekannt</option>
-                    <option value="lahm rechts">Lahm rechts</option>
-                    <option value="lahm links">Lahm links</option>
-                    <option value="beide Hinterklauen">Beide Hinterklauen</option>
-                </select>
-            </div>
-        </div>
-        <label>Notizen zur Kuh</label>
-        <textarea id="cowNotes" placeholder="z.B. Problem mit Mortellaro, sensibel beim Beschneiden"></textarea>
+      <h2>Mobiler Klauenpfleger für Milchviehbetriebe<span class="badge">Niedersachsen</span></h2>
+      <p style="font-size: 0.95rem; margin-top: 0.4rem;">
+        Ich bin <strong>Bakhtovar Valiev</strong>, selbst aktiver Klauenpfleger und Landwirt.  
+        Ich unterstütze Betriebe bei:
+      </p>
+      <ul style="margin-top: 0.5rem;">
+        <li>regelmäßiger Klauenpflege und Lahmheitsprophylaxe</li>
+        <li>Behandlung von Mortellaro, Sohlengeschwüren, Ballenfäule u.a.</li>
+        <li>dokumentierter Klauenpflege für jedes Tier</li>
+      </ul>
 
-        <button onclick="saveCow()">💾 Kuh speichern</button>
-        <div id="cowMessage" class="msg"></div>
-        <div class="info">
-            Tipp: gleiche Nummer noch einmal speichern – Kuh wird aktualisiert (Hof, Notizen usw.).
-        </div>
+      <div class="cta-buttons">
+        <!-- ЗАМЕНИ НОМЕР НА СВОЙ -->
+        <a class="btn btn-primary" href="tel:+4915112345678">Jetzt anrufen</a>
+        <!-- ЗАМЕНИ WHATSAPP-LINK НА СВОЙ -->
+        <a class="btn btn-ghost" href="https://wa.me/4915112345678" target="_blank">WhatsApp Anfrage</a>
+      </div>
     </section>
 
-    <!-- 2. BEHANDLUNG EINTRAGEN -->
+    <!-- Leistungen & Regionen -->
+    <section class="card grid-2">
+      <div>
+        <h2>Leistungen</h2>
+        <ul>
+          <li>Professionelle Klauenpflege im modernen Klauenstand</li>
+          <li>Behandlung von Lahmheiten und akuten Problemen</li>
+          <li>Klauenbad-Empfehlungen und Stallhygiene-Beratung</li>
+          <li>Dokumentation je Kuh (Nummer, Diagnose, Behandlung)</li>
+        </ul>
+        <div class="pill-list">
+          <span class="pill">Mortellaro</span>
+          <span class="pill">Sohlengeschwür</span>
+          <span class="pill">Panaritium</span>
+          <span class="pill">Hof- und Stallservice</span>
+        </div>
+      </div>
+
+      <div>
+        <h2>Einsatzgebiete</h2>
+        <div class="label">Region</div>
+        <div class="value">Friesland, Wilhelmshaven, Sande, Umgebung</div>
+
+        <div class="label" style="margin-top: 0.6rem;">Betriebsgröße</div>
+        <div class="value">Kleine Familienbetriebe bis große Milchviehbestände</div>
+
+        <div class="label" style="margin-top: 0.6rem;">Sprache</div>
+        <div class="value">Deutsch, Russisch, Tadschikisch</div>
+      </div>
+    </section>
+
+    <!-- Beispiel Dokumentation -->
     <section class="card">
-        <h2>2. Behandlung eintragen</h2>
-        <label>Kuh Nummer auswählen</label>
-        <select id="treatCowSelect">
-            <option value="">-- erst Kuh speichern --</option>
-        </select>
+      <h2>Beispiel: Klauenpflege-Dokumentation</h2>
+      <p style="font-size: 0.9rem; margin-top: 0.4rem;">
+        Jede bearbeitete Kuh kann dokumentiert werden – für Tierarzt, Kontrolle und betriebseigene Auswertung.
+      </p>
 
-        <div class="row">
-            <div>
-                <label>Datum der Behandlung</label>
-                <input id="treatDate" placeholder="TT.MM.JJJJ">
-            </div>
-            <div>
-                <label>Klauen-Seite</label>
-                <select id="treatLeg">
-                    <option value="VL">VL (Vorne links)</option>
-                    <option value="VR">VR (Vorne rechts)</option>
-                    <option value="HL">HL (Hinten links)</option>
-                    <option value="HR">HR (Hinten rechts)</option>
-                </select>
-            </div>
-        </div>
-
-       <label for="treatProblem">Problem / Diagnose</label>
-
-<!-- Предустановленные проблемы для быстрого выбора -->
-<select id="treatProblem" onchange="setActionsByProblem()">
-    <option value="">– Krankheit auswählen –</option>
-
-    <!-- Standart-Probleme -->
-    <option value="Mortellaro (Dermatitis digitalis)">Mortellaro (Dermatitis digitalis)</option>
-    <option value="Sohlengeschwür">Sohlengeschwür</option>
-    <option value="Weiße-Linie-Defekt">Weiße-Linie-Defekt</option>
-    <option value="Ballengeschwür">Ballengeschwür</option>
-    <option value="Klauenfäule">Klauenfäule</option>
-    <option value="Zwischenklauenentzündung (Phlegmone)">Zwischenklauenentzündung (Phlegmone)</option>
-    <option value="Hornspalt / Riss">Hornspalt / Riss</option>
-    <option value="Überwuchs / Fehlstellung">Überwuchs / Fehlstellung</option>
-    <option value="Trauma / mechanische Verletzung">Trauma / mechanische Verletzung</option>
-
-    <!-- Deine gewünschten Zusatz-Probleme -->
-    <option value="Limax (doppelte Sohle)">Limax (doppelte Sohle)</option>
-    <option value="Allgemeine Entzündung / Schwellung">Allgemeine Entzündung / Schwellung</option>
-    <option value="Panaritium (tiefe Klauenentzündung)">Panaritium (tiefe Klauenentzündung)</option>
-</select>
-<!-- Поле, которое реально сохраняется в базе (ничего менять в JS не нужно) -->
-<textarea id="treatProblem" placeholder="Problem / Diagnose eingeben…"></textarea>
-  <label>Maßnahmen (Was wurde gemacht?)</label>
-
-<select id="treatActionsPreset" onchange="applyActionsPreset()" style="margin-bottom:6px;">
-    <option value="">– Maßnahme auswählen –</option>
-
-    <!-- Allgemein -->
-    <option value="Funktioneller Klauenschnitt">
-        Funktioneller Klauenschnitt
-    </option>
-    <option value="Überwuchs korrigiert">
-        Überwuchs korrigiert
-    </option>
-    <option value="Lose Hornteile entfernt">
-        Lose Hornteile entfernt
-    </option>
-
-    <!-- Mortellaro -->
-    <option value="Mortellaro gereinigt und behandelt">
-        Mortellaro gereinigt und behandelt
-    </option>
-
-    <!-- Limax / doppelte Sohle -->
-    <option value="Doppelte Sohle entfernt">
-        Doppelte Sohle entfernt
-    </option>
-
-    <!-- Ballengeschwür -->
-    <option value="Ballengeschwür versorgt">
-        Ballengeschwür versorgt
-    </option>
-
-    <!-- Weiße Linie -->
-    <option value="Weiße-Linie-Defekt freigelegt">
-        Weiße-Linie-Defekt freigelegt
-    </option>
-
-    <!-- Panaritium / Entzündung -->
-    <option value="Entzündung freigelegt">
-        Entzündung freigelegt
-    </option>
-
-    <!-- Klauenfäule -->
-    <option value="Faules Horn entfernt">
-        Faules Horn entfernt
-    </option>
-
-    <!-- Trauma -->
-    <option value="Verletzung versorgt">
-        Verletzung versorgt
-    </option>
-
-    <!-- Hornspalt -->
-    <option value="Hornspalt entlastet">
-        Hornspalt entlastet
-    </option>
-
-    <!-- Block / Verband -->
-    <option value="Entlastungsblock gesetzt">
-        Entlastungsblock gesetzt
-    </option>
-    <option value="Verband angelegt">
-        Verband angelegt
-    </option>
-
-    <!-- Kontrolle -->
-    <option value="Nachkontrolle empfohlen">
-        Nachkontrolle empfohlen
-    </option>
-</select>
-
-
-<textarea id="treatActions"
-          placeholder="Maßnahmen eingeben oder ergänzen…"
-          rows="2"></textarea>
-        <div class="row">
-            <div>
-                <label>Block gesetzt?</label>
-                <select id="treatBlock">
-                    <option value="">Nein / nicht relevant</option>
-                    <option value="ja">Ja</option>
-                </select>
-            </div>
-            <div>
-                <label>Verband?</label>
-                <select id="treatBandage">
-                    <option value="">Nein</option>
-                    <option value="ja">Ja</option>
-                </select>
-            </div>
-        </div>
-
-<label>Produkt / Medikament</label>
-
-<select id="treatProductPreset"
-        onchange="applyProductPreset()"
-        style="margin-bottom:6px;">
-    <option value="">– Produkt auswählen –</option>
-    <option value="Blue Spray">Blue Spray</option>
-    <option value="Novoderm Salbe">Novoderm Salbe</option>
-    <option value="Schwarze Salbe">Schwarze Salbe</option>
-    <option value="Intra Hoof-fit Gel">Intra Hoof-fit Gel</option>
-    <option value="Mortellaro-Salbe">Mortellaro-Salbe</option>
-    <option value="Kupfersulfat-Spray">Kupfersulfat-Spray</option>
-    <option value="Jodspray">Jodspray</option>
-    <option value="Ohne Medikament">Ohne Medikament</option>
-</select>
-
-<input id="treatProduct"
-       placeholder="Produkt wird übernommen oder manuell eingeben">
-        <label>Nächste Kontrolle / Termin</label>
-        <input id="treatNextCheck" placeholder="z.B. in 2 Wochen, 07.12.2025">
-
-        <label>Zusätzliche Notizen zur Behandlung</label>
-        <textarea id="treatNotes" placeholder="z.B. stark entzündet, vorsichtig beschneiden"></textarea>
-
-        <button onclick="saveTreatment()">💾 Behandlung speichern</button>
-        <div id="treatMessage" class="msg"></div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Kuh-Nr.</th>
+              <th>Datum</th>
+              <th>Diagnose</th>
+              <th>Behandlung</th>
+              <th>Bemerkung</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>148</td>
+              <td>07.12.2025</td>
+              <td>Mortellaro hinten links</td>
+              <td>Reinigung, Block, Verband</td>
+              <td>Nachkontrolle in 2 Wochen</td>
+            </tr>
+            <tr>
+              <td>233</td>
+              <td>07.12.2025</td>
+              <td>Sohlengeschwür vorne rechts</td>
+              <td>Ausschneiden, Druckentlastung</td>
+              <td>Lauffläche verbessern</td>
+            </tr>
+            <tr>
+              <td>92</td>
+              <td>07.12.2025</td>
+              <td>stark überwachsene Klauen</td>
+              <td>funktionelle Klauenpflege</td>
+              <td>in 6 Monaten wiederholen</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- 3. HISTORIE -->
+    <!-- Info für Landwirte -->
     <section class="card">
-        <h2>3. Kuh-Historie anzeigen</h2>
-        <label>Kuh Nummer für Historie</label>
-        <select id="historyCowSelect">
-            <option value="">Kuh auswählen…</option>
-        </select>
-
-        <button class="secondary" onclick="showHistory()">📜 Historie anzeigen</button>
-        <div id="historyArea"></div>
+      <h2>Warum regelmäßige Klauenpflege wichtig ist</h2>
+      <ul>
+        <li>weniger Lahmheiten und weniger Schmerzen für die Tiere</li>
+        <li>höhere Milchleistung und bessere Fruchtbarkeit</li>
+        <li>weniger Tierarztkosten langfristig</li>
+        <li>bessere Tiergesundheit &amp; bessere Laufstallnutzung</li>
+      </ul>
     </section>
 
-    <!-- 4. ALLE KÜHE -->
+    <!-- Kontaktblock -->
     <section class="card">
-        <h2>4. Alle Kühe anzeigen</h2>
-        <button class="secondary" onclick="showAllCows()">📋 Liste aller Kühe</button>
-        <div id="allCowsArea" style="margin-top:8px;"></div>
+      <h2>Kontakt & Terminvereinbarung</h2>
+      <p style="font-size: 0.9rem; margin-top: 0.4rem;">
+        Rufen Sie an oder schreiben Sie per WhatsApp.  
+        Ich melde mich in der Regel noch am selben Tag zurück.
+      </p>
+
+      <div style="margin-top: 0.6rem;">
+        <div class="label">Telefon</div>
+        <div class="value">+49 151 12345678</div>
+
+        <div class="label" style="margin-top: 0.4rem;">E-Mail</div>
+        <div class="value">info@valiev-klauenservice.de</div>
+
+        <div class="label" style="margin-top: 0.4rem;">Standort</div>
+        <div class="value">Sande (Friesland), Niedersachsen</div>
+      </div>
+
+      <div class="cta-buttons">
+        <a class="btn btn-primary" href="tel:+4915112345678">Termin anfragen</a>
+        <a class="btn btn-ghost" href="https://wa.me/4915112345678" target="_blank">Nachricht per WhatsApp</a>
+      </div>
     </section>
-
-    <!-- 5. TAGESÜBERSICHT / PDF-BERICHT -->
-    <section class="card" id="reportCard">
-        <h2>5. Tagesübersicht / PDF-Bericht</h2>
-        <label>Datum der Behandlungen (TT.MM.JJJJ)</label>
-        <input id="reportDate" placeholder="z.B. 07.12.2025">
-
-        <button onclick="renderDailyReport()">Tagesbericht anzeigen</button>
-        <button class="secondary" onclick="window.print()">Für PDF / Druck vorbereiten</button>
-
-        <p class="info">
-            Tipp: Datum eingeben – Bericht anzeigen – dann im Browser „Als PDF speichern“ wählen, um einen Bericht für den Betrieb zu erstellen.
-        </p>
-
-        <div id="reportArea"></div>
-    </section>
-
-    <!-- DATENVERWALTUNG + BACKUP -->
-    <section class="card">
-        <h2>⚠ Datenverwaltung</h2>
-        <p class="info">
-            Alle Daten werden lokal im Browser gespeichert (localStorage). Kein Internet, kein Server.
-            <br>Nur auf diesem Gerät sichtbar.
-        </p>
-        <button class="danger" onclick="clearAll()">Alles löschen (alle Kühe &amp; Behandlungen)</button>
-        <div id="clearMessage" class="msg"></div>
-
-        <h3 style="margin-top:16px;">Backup</h3>
-        <p class="info">
-            Backup-Datei aller Kühe &amp; Behandlungen erstellen und später wieder importieren (z.B. beim Handywechsel).
-        </p>
-        <button onclick="exportBackup()">Backup exportieren</button>
-
-        <p class="info" style="margin-top:10px;">
-            Backup-Datei importieren (überschreibt aktuelle Daten):
-        </p>
-        <input type="file" id="backupFile" accept="application/json" onchange="importBackup(event)">
-        <div id="backupMessage" class="msg"></div>
-    </section>
-
-</main>
-
-<script>
-    // ---------- ONLINE / OFFLINE STATUS ----------
-    function updateOnlineStatus() {
-        var el = document.getElementById("connectionStatus");
-        if (!el) return;
-        if (navigator.onLine) {
-            el.textContent = "🟢 Online-Modus (bereit für Cloud-Synchronisation)";
-            el.style.color = "#bbf7d0";
-        } else {
-            el.textContent = "🔴 Offline-Modus (lokale Datenspeicherung)";
-            el.style.color = "#fecaca";
-        }
-    }
-    window.addEventListener("load", updateOnlineStatus);
-    window.addEventListener("online", updateOnlineStatus);
-    window.addEventListener("offline", updateOnlineStatus);
-
-    // ---------- DATENSTRUKTUR ----------
-    let cows = {}; // { "245": { farm, geburt, lahm, notizen, behandlungen: [...] } }
-
-    function loadData() {
-        try {
-            const raw = localStorage.getItem("bakhtovar_klauen_data");
-            cows = raw ? JSON.parse(raw) || {} : {};
-        } catch (e) {
-            cows = {};
-        }
-    }
-
-    function saveData() {
-        localStorage.setItem("bakhtovar_klauen_data", JSON.stringify(cows));
-        updateCowSelects();
-    }
-
-    function updateCowSelects() {
-        const treatSel = document.getElementById("treatCowSelect");
-        const histSel = document.getElementById("historyCowSelect");
-
-        function fillSelect(sel) {
-            const current = sel.value;
-            sel.innerHTML = "";
-            const opt0 = document.createElement("option");
-            opt0.value = "";
-            opt0.textContent = "-- Kuh auswählen --";
-            sel.appendChild(opt0);
-
-            const numbers = Object.keys(cows).sort();
-            numbers.forEach(num => {
-                const o = document.createElement("option");
-                o.value = num;
-                const c = cows[num];
-                const hof = c.farm ? " (" + c.farm + ")" : "";
-                o.textContent = num + hof;
-                sel.appendChild(o);
-            });
-
-            if (current && cows[current]) sel.value = current;
-        }
-
-        fillSelect(treatSel);
-        fillSelect(histSel);
-    }
-
-    // ---------- KUH SPEICHERN ----------
-    function saveCow() {
-        const num   = document.getElementById("cowNumber").value.trim();
-        const farm  = document.getElementById("farmName").value.trim();
-        const geb   = document.getElementById("birthDate").value.trim();
-        const lahm  = document.getElementById("lameStatus").value.trim();
-        const notes = document.getElementById("cowNotes").value.trim();
-        const msg   = document.getElementById("cowMessage");
-
-        if (!num) {
-            msg.textContent = "Bitte Kuh-Nummer eingeben.";
-            msg.className = "msg err";
-            return;
-        }
-
-        if (!cows[num]) {
-            cows[num] = {
-                farm: farm,
-                geburt: geb,
-                lahm: lahm,
-                notizen: notes,
-                behandlungen: []
-            };
-            msg.textContent = "✅ Neue Kuh gespeichert: " + num;
-        } else {
-            cows[num].farm    = farm  || cows[num].farm;
-            cows[num].geburt  = geb   || cows[num].geburt;
-            cows[num].lahm    = lahm  || cows[num].lahm;
-            cows[num].notizen = notes || cows[num].notizen;
-            msg.textContent   = "✅ Kuh aktualisiert: " + num;
-        }
-
-        msg.className = "msg ok";
-        saveData();
-    }
-
-    // ---------- BEHANDLUNG SPEICHERN ----------
-    function saveTreatment() {
-        const num       = document.getElementById("treatCowSelect").value;
-        const date      = document.getElementById("treatDate").value.trim();
-        const leg       = document.getElementById("treatLeg").value;
-        const problem   = document.getElementById("treatProblem").value.trim();
-        const actions   = document.getElementById("treatActions").value.trim();
-        const block     = document.getElementById("treatBlock").value;
-        const bandage   = document.getElementById("treatBandage").value;
-        const product   = document.getElementById("treatProduct").value.trim();
-        const nextCheck = document.getElementById("treatNextCheck").value.trim();
-        const notes     = document.getElementById("treatNotes").value.trim();
-        const msg       = document.getElementById("treatMessage");
-
-        if (!num) {
-            msg.textContent = "Bitte zuerst eine Kuh auswählen.";
-            msg.className = "msg err";
-            return;
-        }
-        if (!cows[num]) {
-            msg.textContent = "Diese Kuh existiert nicht mehr.";
-            msg.className = "msg err";
-            return;
-        }
-
-        const today = new Date();
-        const defaultDate = today.toLocaleDateString("de-DE");
-        const finalDate = date || defaultDate;
-
-        const entry = {
-            datum: finalDate,
-            klaue: leg,
-            problem: problem,
-            aktion: actions,
-            block: block,
-            verband: bandage,
-            produkt: product,
-            naechsteKontrolle: nextCheck,
-            notizen: notes
-        };
-
-        cows[num].behandlungen.push(entry);
-        msg.textContent = "✅ Behandlung gespeichert für Kuh " + num;
-        msg.className = "msg ok";
-
-        saveData();
-    }
-
-    // ---------- HISTORIE ----------
-    function showHistory() {
-        const num  = document.getElementById("historyCowSelect").value;
-        const area = document.getElementById("historyArea");
-        area.innerHTML = "";
-
-        if (!num || !cows[num]) {
-            area.innerHTML = "<p class='msg err'>Kuh nicht gefunden.</p>";
-            return;
-        }
-        const c = cows[num];
-
-        let html = "";
-        html += "<p><span class='badge'>Kuh</span> <strong>" + num + "</strong>";
-        if (c.farm) html += " – " + c.farm;
-        html += "</p>";
-        if (c.geburt) html += "<p>📅 Geburt: " + c.geburt + "</p>";
-        if (c.lahm)   html += "<p>⚠ Lahm: " + c.lahm + "</p>";
-        if (c.notizen) html += "<p>📝 Notizen: " + c.notizen + "</p>";
-
-        if (!c.behandlungen || c.behandlungen.length === 0) {
-            html += "<p class='info'>Keine Behandlungen eingetragen.</p>";
-        } else {
-            html += "<h3>Behandlungen:</h3>";
-            html += "<table><thead><tr>" +
-                "<th>Datum</th><th>Klauen</th><th>Problem</th><th>Aktion</th>" +
-                "<th>Block</th><th>Verband</th><th>Produkt</th><th>Nächste Kontrolle</th>" +
-                "</tr></thead><tbody>";
-            c.behandlungen.forEach(b => {
-                html += "<tr>" +
-                    "<td>" + (b.datum || "") + "</td>" +
-                    "<td>" + (b.klaue || "") + "</td>" +
-                    "<td>" + (b.problem || "") + "</td>" +
-                    "<td>" + (b.aktion || "") + "</td>" +
-                    "<td>" + (b.block === "ja" ? "✅" : "") + "</td>" +
-                    "<td>" + (b.verband === "ja" ? "✅" : "") + "</td>" +
-                    "<td>" + (b.produkt || "") + "</td>" +
-                    "<td>" + (b.naechsteKontrolle || "") + "</td>" +
-                    "</tr>";
-            });
-            html += "</tbody></table>";
-        }
-
-        area.innerHTML = html;
-    }
-
-    // ---------- ALLE KÜHE ----------
-    function showAllCows() {
-        const area = document.getElementById("allCowsArea");
-        area.innerHTML = "";
-
-        const numbers = Object.keys(cows).sort();
-        if (numbers.length === 0) {
-            area.innerHTML = "<p class='info'>Noch keine Kühe gespeichert.</p>";
-            return;
-        }
-
-        let html = "<table><thead><tr>" +
-            "<th>Kuh</th><th>Hof</th><th>Geburt</th><th>Lahm</th><th>Behandlungen</th>" +
-            "</tr></thead><tbody>";
-
-        numbers.forEach(num => {
-            const c = cows[num];
-            html += "<tr>" +
-                "<td>" + num + "</td>" +
-                "<td>" + (c.farm || "") + "</td>" +
-                "<td>" + (c.geburt || "") + "</td>" +
-                "<td>" + (c.lahm || "") + "</td>" +
-                "<td>" + ((c.behandlungen && c.behandlungen.length) ? c.behandlungen.length : 0) + "</td>" +
-                "</tr>";
-        });
-
-        html += "</tbody></table>";
-        area.innerHTML = html;
-    }
-
-    // ---------- ALLES LÖSCHЕН ----------
-    function clearAll() {
-        if (!confirm("Wirklich ALLE Daten löschen?")) return;
-
-        cows = {};
-        localStorage.removeItem("bakhtovar_klauen_data");
-
-        document.getElementById("historyArea").innerHTML = "";
-        document.getElementById("allCowsArea").innerHTML = "";
-        document.getElementById("clearMessage").innerText =
-            "Alle Daten gelöscht (inkl. Speicher).";
-        document.getElementById("clearMessage").className = "msg ok";
-
-        updateCowSelects();
-    }
-
-    // ---------- BACKUP ----------
-    function exportBackup() {
-        try {
-            var raw = localStorage.getItem("bakhtovar_klauen_data");
-            if (!raw) {
-                alert("Es sind keine Daten zum Sichern vorhanden.");
-                return;
-            }
-
-            var backup = {
-                exportedAt: new Date().toISOString(),
-                key: "bakhtovar_klauen_data",
-                data: raw
-            };
-
-            var json = JSON.stringify(backup, null, 2);
-            var blob = new Blob([json], { type: "application/json" });
-            var url = URL.createObjectURL(blob);
-
-            var a = document.createElement("a");
-            var heute = new Date().toISOString().slice(0, 10);
-            a.href = url;
-            a.download = "klauenpflege-backup-" + heute + ".json";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            document.getElementById("backupMessage").innerText =
-                "Backup wurde heruntergeladen.";
-            document.getElementById("backupMessage").className = "msg ok";
-        } catch (e) {
-            console.error(e);
-            alert("Fehler beim Backup-Export: " + e.message);
-        }
-    }
-
-    function importBackup(event) {
-        var file = event.target.files[0];
-        if (!file) return;
-
-        if (!confirm("Achtung: Vorhandene Daten werden überschrieben. Fortfahren?")) {
-            event.target.value = "";
-            return;
-        }
-
-        var reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                var text = e.target.result;
-                var backup = JSON.parse(text);
-
-                var key = backup.key || "bakhtovar_klauen_data";
-                var rawData = backup.data || null;
-
-                if (!rawData) {
-                    alert("Backup-Datei enthält keine Daten.");
-                    event.target.value = "";
-                    return;
-                }
-
-                localStorage.setItem(key, rawData);
-
-                document.getElementById("backupMessage").innerText =
-                    "Backup erfolgreich importiert. Seite wird neu geladen.";
-                document.getElementById("backupMessage").className = "msg ok";
-
-                event.target.value = "";
-                location.reload();
-            } catch (err) {
-                console.error(err);
-                alert("Fehler beim Backup-Import: " + err.message);
-                event.target.value = "";
-            }
-        };
-        reader.readAsText(file);
-    }
-
-  // ---------- TAGESBERICHT ----------
-function renderDailyReport() {
-    var date = document.getElementById("reportDate").value.trim();
-    var area = document.getElementById("reportArea");
-
-    if (!date) {
-        area.innerHTML = "<p class='info'>Bitte ein Datum im Format TT.MM.JJJJ eingeben.</p>";
-        return;
-    }
-
-    var rows = [];
-
-    // через все Kühe и Behandlungen
-    Object.keys(cows).forEach(function (num) {
-        var c = cows[num];
-        if (!c.behandlungen || !c.behandlungen.length) return;
-
-        c.behandlungen.forEach(function (b) {
-            if (b.datum === date) {
-                rows.push({
-                    kuh: num,
-                    farm: c.farm || "",
-                    klaue: b.klaue || "",
-                    problem: b.problem || "",
-                    aktion: b.aktion || "",
-                    block: (b.block === "ja") ? "Ja" : "",
-                    verband: (b.verband === "ja") ? "Ja" : "",
-                    produkt: b.produkt || "",
-                    naechste: b.naechsteKontrolle || ""
-                });
-            }
-        });
-    });
-
-    if (!rows.length) {
-        area.innerHTML = "<p class='info'>Keine Behandlungen für dieses Datum gefunden.</p>";
-        return;
-    }
-
-    // Betrieb из первой строки, где есть Hof
-    var betriebName = "";
-    rows.forEach(function (r) {
-        if (!betriebName && r.farm) {
-            betriebName = r.farm;
-        }
-    });
-
-    var ort = "Sande / Niedersachsen";
-
-    var html = "";
-    html += "<div class='report-container'>";
-
-    // шапка
-    html += "  <div class='report-header'>";
-    html += "    <div class='report-title-row'>";
-    html += "      <div>";
-    html += "        <span class='report-header-icon'>🐄</span>";
-    html += "        <span class='report-title-main'>Valiev Klauenpflege Service</span>";
-    html += "      </div>";
-    html += "      <div class='report-title-date'>Tagesbericht Klauenpflege – " + date + "</div>";
-    html += "    </div>";
-    html += "    <div class='report-subtitle'>Digitale Klauenpflege-Software für Dokumentation, Kontrolle und Auswertung</div>";
-    html += "  </div>";
-
-    // тонкая серая линия под шапкой
-    html += "  <div class='report-divider'></div>";
-
-    // блок с адресом в три строки, как в старом отчёте
-html += "  <div class='report-meta'>";
-if (betriebName) {
-    html += "    <div><strong>Betrieb:</strong> " + betriebName + "</div>";
-}
-html += "    <div><strong>Ort:</strong> " + ort + "</div>";
-html += "    <div><strong>Dienstleister:</strong> Valiev Klauenpflege Service</div>";
-html += "  </div>";
-
-    // таблица
-    html += "  <table class='report-table'>";
-    html += "    <thead><tr>" +
-        "<th>Kuhnr.</th>" +
-        "<th>Betrieb / Hof</th>" +
-        "<th>Klaue</th>" +
-        "<th>Problem / Diagnose</th>" +
-        "<th>Maßnahmen</th>" +
-        "<th>Block</th>" +
-        "<th>Verband</th>" +
-        "<th>Produkt</th>" +
-        "<th>Nächste Kontrolle</th>" +
-        "</tr></thead><tbody>";
-
-    rows.forEach(function (r) {
-        html += "<tr>" +
-            "<td>" + r.kuh + "</td>" +
-            "<td>" + (r.farm || "-") + "</td>" +
-            "<td>" + (r.klaue || "-") + "</td>" +
-            "<td>" + (r.problem || "-") + "</td>" +
-            "<td>" + (r.aktion || "-") + "</td>" +
-            "<td>" + (r.block || "-") + "</td>" +
-            "<td>" + (r.verband || "-") + "</td>" +
-            "<td>" + (r.produkt || "-") + "</td>" +
-            "<td>" + (r.naechste || "-") + "</td>" +
-            "</tr>";
-    });
-
-    html += "    </tbody></table>";
-
-    // подвал
-    html += "  <div class='report-footer'>";
-    html += "    <p><strong>Hinweis:</strong> Bericht kann digital als PDF gespeichert oder ausgedruckt dem Betrieb zur Verfügung gestellt werden.</p>";
-    html += "    <p><strong>Klauenpfleger:</strong> B. Valiev, Valiev Klauenpflege Service</p>";
-    html += "  </div>";
-
-    html += "</div>";
-
-    area.innerHTML = html;
-}
-
-// ---------- ПРОВЕРКА: простые пресеты ----------
-
-// 1) Болезнь -> просто записать текст в Problem
-function applyProblemPreset() {
-    const sel  = document.getElementById("treatProblemPreset");
-    const prob = document.getElementById("treatProblem");
-
-    if (!sel || !prob) {
-        alert("treatProblemPreset или treatProblem не найден");
-        return;
-    }
-
-    prob.value = sel.value || "";
-    if (sel.value) {
-        alert("ProblemPreset выбран: " + sel.value);
-    }
-}
-
-// 2) Maßnahmen -> просто записать текст в поле
-function applyActionsPreset() {
-    const sel   = document.getElementById("treatActionsPreset");
-    const field = document.getElementById("treatActions");
-
-    if (!sel || !field) {
-        alert("treatActionsPreset или treatActions не найден");
-        return;
-    }
-
-    field.value = sel.value || "";
-    if (sel.value) {
-        alert("Maßnahme: " + sel.value);
-    }
-}
-
-// 3) Produkt -> просто записать текст в поле
-function applyProductPreset() {
-    const sel   = document.getElementById("treatProductPreset");
-    const field = document.getElementById("treatProduct");
-
-    if (!sel || !field) {
-        alert("treatProductPreset или treatProduct не найден");
-        return;
-    }
-
-    field.value = sel.value || "";
-    if (sel.value) {
-        alert("Produkt: " + sel.value);
-    }
-}
-// Регистрация Service Worker для PWA
-if ("serviceWorker" in navigator) {          // ВАЖНО: W – большая
-    window.addEventListener("load", function () {
+  </main>
+
+  <footer>
+    © 2025 Valiev Klauenpflege Service – Professionelle Klauenpflege in Niedersachsen.
+  </footer>
+
+  <script>
+    // Service Worker Registrierung für PWA
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
         navigator.serviceWorker
-            .register("./sw.js")
-            .catch(function (err) {
-                console.error("Service Worker Registrierung fehlgeschlagen:", err);
-            });
-    });
-}
-  // ---------- INIT ----------
-    window.addEventListener("load", function () {
-        loadData();
-        updateCowSelects();
-    });
-</script>
-
+          .register("sw.js")
+          .catch((err) => console.log("Service Worker Fehler:", err));
+      });
+    }
+  </script>
 </body>
 </html>
